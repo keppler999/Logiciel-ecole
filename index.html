@@ -3,184 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite | Gestion Direction</title>
-    
+    <title>Scholarite | Gestion Administrative</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-
-        :root {
-            --gold: #D4AF37; --black: #000000; --white: #FFFFFF;
-            --gray: #F4F4F4; --border: #EAEAEA;
-        }
-
+        :root { --gold: #D4AF37; --black: #000000; --white: #FFFFFF; --gray: #F4F4F4; --border: #EAEAEA; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--white); color: var(--black); }
 
-        /* --- DASHBOARD PRINCIPAL --- */
-        #main-dashboard { display: none; min-height: 100vh; }
-        .sidebar { width: 280px; border-right: 1px solid var(--border); padding: 30px; height: 100vh; position: fixed; }
-        .content { margin-left: 280px; padding: 40px; }
+        /* Navigation */
+        header { padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: #fff; position: sticky; top: 0; z-index: 100; }
+        .logo-box { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+        .logo-sq { width: 35px; height: 35px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 8px; }
 
-        /* --- LOGO UPLOADER --- */
-        .logo-placeholder { 
-            width: 120px; height: 120px; border: 2px dashed var(--border); 
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; overflow: hidden; margin-bottom: 20px;
-        }
-        .logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        /* Vues */
+        .view { display: none; padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
+        .active { display: block; }
 
-        /* --- CLASSE CARDS --- */
-        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .class-card { 
-            padding: 20px; border: 1px solid var(--border); border-radius: 15px; 
-            cursor: pointer; transition: 0.3s; background: #fff;
-        }
-        .class-card:hover { border-color: var(--gold); background: var(--gray); }
+        /* Grilles & Cartes */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { padding: 30px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .card i { font-size: 30px; margin-bottom: 15px; display: block; }
 
-        /* --- MODAL ELEVES --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: #fff; padding: 30px; border-radius: 25px; width: 500px; max-height: 80vh; overflow-y: auto; }
+        /* Accordeons Options */
+        .opt-folder { border: 1px solid var(--border); border-radius: 15px; margin-bottom: 10px; overflow: hidden; }
+        .opt-header { padding: 15px 20px; background: var(--gray); cursor: pointer; display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; }
+        .opt-content { display: none; padding: 15px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; background: #fff; }
 
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); }
-        .btn { padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; transition: 0.3s; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-black { background: #000; color: var(--gold); width: 100%; }
+        /* Saisie Rapide Élèves */
+        textarea { width: 100%; height: 150px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; margin-bottom: 15px; resize: none; }
+        .btn-gold { background: var(--black); color: var(--gold); padding: 15px 30px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
+        .student-item { padding: 10px; border-bottom: 1px solid var(--gray); font-size: 13px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
-    <div id="portal-view" style="padding: 100px; text-align: center;">
-        <h1 style="font-weight: 800; font-size: 40px;">SCHOLARITE</h1>
-        <p>Système de gestion scolaire RDC</p>
-        <button class="btn btn-black" style="width: 200px; margin-top: 20px;" onclick="demoLogin()">ENTRER (ACCÈS DIRECTEUR)</button>
+    <header id="main-header" style="display:none;">
+        <div class="logo-box">
+            <div class="logo-sq">S</div>
+            <span>SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></span>
+        </div>
+        <div id="school-logo-area" style="cursor:pointer;" onclick="triggerLogoUpload()">
+            <div id="logo-placeholder" style="font-size:10px; border:1px dashed #ccc; padding:5px 10px; border-radius:5px;">+ LOGO ÉCOLE</div>
+            <img id="school-logo-img" style="display:none; height:40px; border-radius:5px;">
+            <input type="file" id="logo-input" hidden accept="image/*" onchange="loadLogo(event)">
+        </div>
+    </header>
+
+    <div id="view-portal" class="view active" style="text-align: center; padding-top: 100px;">
+        <h1 style="font-size: 40px; margin-bottom: 10px;">Scholarite</h1>
+        <p style="color: #888; margin-bottom: 50px;">Logiciel de gestion scolaire intelligente en RDC</p>
+        <button class="btn-gold" onclick="openLogin()">ACCÉDER À LA DIRECTION</button>
     </div>
 
-    <div id="main-dashboard">
-        <aside class="sidebar">
-            <div id="logo-zone" onclick="document.getElementById('file-input').click()">
-                <div class="logo-placeholder" id="logo-view">
-                    <i class="fa-solid fa-camera" id="cam-icon"></i>
-                </div>
-                <input type="file" id="file-input" hidden onchange="uploadLogo(event)">
-            </div>
-            <h2 id="school-name" style="font-size: 18px; margin-bottom: 5px;">ÉCOLE PLATINUM</h2>
-            <p style="font-size: 12px; color: #888; margin-bottom: 30px;">Direction des Études</p>
-            
-            <nav>
-                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer;"><i class="fa-solid fa-gauge" style="margin-right: 10px;"></i> Dashboard</div>
-                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer; color: var(--gold);"><i class="fa-solid fa-school" style="margin-right: 10px;"></i> Mes Classes</div>
-                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer;"><i class="fa-solid fa-user-tie" style="margin-right: 10px;"></i> Professeurs</div>
-            </nav>
-        </aside>
-
-        <main class="content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-                <h1>Gestion des Classes</h1>
-                <div id="date-now" style="font-weight: 600; font-size: 14px;"></div>
-            </header>
-
-            <section id="classes-section">
-                <h3 style="margin-bottom: 10px;">Éducation de Base (7e - 8e)</h3>
-                <div class="class-grid" id="grid-base">
-                    <div class="class-card" onclick="openClass('7ème EB')"><h4>7ème EB</h4><small>0 Élèves</small></div>
-                    <div class="class-card" onclick="openClass('8ème EB')"><h4>8ème EB</h4><small>0 Élèves</small></div>
-                </div>
-
-                <h3 style="margin-top: 40px; margin-bottom: 10px;">Humanités (1ère - 4ème)</h3>
-                <div class="class-grid" id="grid-humanites">
-                    <div class="class-card" onclick="openClass('1ère Électricité')"><h4>1ère Élec</h4><small>0 Élèves</small></div>
-                    <div class="class-card" onclick="openClass('1ère Commerciale')"><h4>1ère Comm</h4><small>0 Élèves</small></div>
-                </div>
-            </section>
-        </main>
+    <div id="view-dashboard" class="view">
+        <h2 style="margin-bottom: 30px;">Tableau de Bord Directeur</h2>
+        <div class="grid">
+            <div class="card" onclick="showModule('school-config')"><i class="fa-solid fa-school"></i><h3>Configuration École</h3></div>
+            <div class="card" onclick="showModule('class-list')"><i class="fa-solid fa-users"></i><h3>Gestion des Classes</h3></div>
+            <div class="card"><i class="fa-solid fa-file-invoice-dollar"></i><h3>Finances</h3></div>
+            <div class="card" onclick="location.reload()"><i class="fa-solid fa-power-off"></i><h3>Déconnexion</h3></div>
+        </div>
     </div>
 
-    <div class="modal" id="class-modal">
-        <div class="modal-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="modal-class-title">Classe</h2>
-                <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal()"></i>
-            </div>
-            
-            <div style="background: var(--gray); padding: 20px; border-radius: 15px;">
-                <h4 style="margin-bottom: 10px;">Inscrire un élève</h4>
-                <input type="text" id="stud-name" placeholder="Nom Complet de l'élève">
-                <input type="text" id="stud-id" placeholder="ID / Matricule (Optionnel)">
-                <button class="btn btn-black" style="margin-top: 10px;" onclick="addStudent()">INSCRIRE L'ÉLÈVE</button>
-            </div>
+    <div id="view-school-config" class="view">
+        <button onclick="showModule('dashboard')" style="border:none; background:none; cursor:pointer; font-weight:700; margin-bottom:20px;">← RETOUR</button>
+        <div id="step-options">
+            <h3 style="margin-bottom:20px;">Sélectionnez vos options (Humanités)</h3>
+            <div class="grid" id="options-check-grid"></div>
+            <button class="btn-gold" style="margin-top:20px;" onclick="generateStructure()">CRÉER L'ARCHITECTURE</button>
+        </div>
+    </div>
 
-            <table id="student-table">
-                <thead>
-                    <tr><th>Nom de l'élève</th><th>Matricule</th></tr>
-                </thead>
-                <tbody id="student-list">
-                    </tbody>
-            </table>
+    <div id="view-class-list" class="view">
+        <button onclick="showModule('dashboard')" style="border:none; background:none; cursor:pointer; font-weight:700; margin-bottom:20px;">← RETOUR</button>
+        <h3>Sélectionnez une classe pour ajouter des élèves</h3>
+        <div id="classes-accordion-container" style="margin-top:20px;"></div>
+    </div>
+
+    <div id="view-student-entry" class="view">
+        <button onclick="showModule('class-list')" style="border:none; background:none; cursor:pointer; font-weight:700; margin-bottom:20px;">← RETOUR AUX CLASSES</button>
+        <h2 id="current-class-title" style="color:var(--gold); margin-bottom:10px;">Classe</h2>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+            <div style="background:var(--gray); padding:25px; border-radius:20px;">
+                <h4 style="margin-bottom:15px;">Ajout Rapide d'Élèves</h4>
+                <p style="font-size:11px; color:#666; margin-bottom:10px;">Format : NOM POSTNOM PRÉNOM, DATE DE NAISSANCE (Ex: KABAMBA LUKUSA JEAN, 12/05/2010)</p>
+                <textarea id="bulk-students" placeholder="Un élève par ligne..."></textarea>
+                <button class="btn-gold" onclick="saveStudents()">ENREGISTRER LA LISTE</button>
+            </div>
+            <div style="border:1px solid var(--border); padding:25px; border-radius:20px;">
+                <h4 style="margin-bottom:15px;">Élèves Inscrits (<span id="count-stud">0</span>)</h4>
+                <div id="student-list-display"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Initialisation Date
-        document.getElementById('date-now').innerText = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const SB_URL = "https://dztbxntfsouuyrrigaah.supabase.co"; 
+        const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
         let currentClass = "";
-        let db_students = {}; // Simulation locale pour le moment
+        let schoolData = { options: [], classes: [] };
 
-        function demoLogin() {
-            document.getElementById('portal-view').style.display = 'none';
-            document.getElementById('main-dashboard').style.display = 'flex';
+        // --- NAVIGATION ---
+        function showModule(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            if(id !== 'portal') document.getElementById('main-header').style.display = 'flex';
         }
+
+        function openLogin() { showModule('dashboard'); }
 
         // --- GESTION LOGO ---
-        function uploadLogo(event) {
-            const file = event.target.files[0];
+        function triggerLogoUpload() { document.getElementById('logo-input').click(); }
+        function loadLogo(event) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('logo-view').innerHTML = `<img src="${e.target.result}">`;
-            }
-            reader.readAsDataURL(file);
+            reader.onload = function() {
+                const img = document.getElementById('school-logo-img');
+                img.src = reader.result;
+                img.style.display = 'block';
+                document.getElementById('logo-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(event.target.files[0]);
         }
 
-        // --- GESTION CLASSES & ELEVES ---
-        function openClass(className) {
-            currentClass = className;
-            document.getElementById('modal-class-title').innerText = className;
-            document.getElementById('class-modal').style.display = 'flex';
-            renderStudents();
-        }
+        // --- CONFIG ECOLE ---
+        const optList = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction Bâtiment", "Commercial", "Électricité", "Électronique", "Mécanique", "Coupe-Couture", "Nutrition"];
+        const checkGrid = document.getElementById('options-check-grid');
+        checkGrid.innerHTML = optList.map(o => `<label style="padding:15px; border:1px solid var(--border); border-radius:10px; cursor:pointer;"><input type="checkbox" value="${o}"> ${o}</label>`).join('');
 
-        function closeModal() {
-            document.getElementById('class-modal').style.display = 'none';
-        }
-
-        function addStudent() {
-            const name = document.getElementById('stud-name').value;
-            const id = document.getElementById('stud-id').value || "S-" + Math.floor(Math.random()*1000);
+        async function generateStructure() {
+            const checks = document.querySelectorAll('#options-check-grid input:checked');
+            schoolData.options = Array.from(checks).map(c => c.value);
             
-            if(!name) return alert("Nom requis");
-
-            if(!db_students[currentClass]) db_students[currentClass] = [];
-            db_students[currentClass].push({name, id});
-
-            document.getElementById('stud-name').value = "";
-            document.getElementById('stud-id').value = "";
-            renderStudents();
-        }
-
-        function renderStudents() {
-            const list = document.getElementById('student-list');
-            list.innerHTML = "";
-            const students = db_students[currentClass] || [];
-            
-            students.forEach(s => {
-                list.innerHTML += `<tr><td>${s.name}</td><td>${s.id}</td></tr>`;
+            schoolData.classes = [
+                { label: "7ème Éducation de Base", option: "Base" },
+                { label: "8ème Éducation de Base", option: "Base" }
+            ];
+            schoolData.options.forEach(opt => {
+                ["1ère", "2ème", "3ème", "4ème"].forEach(n => {
+                    schoolData.classes.push({ label: `${n} ${opt}`, option: opt });
+                });
             });
+
+            await _supabase.from('school_config').insert([{ section: 'Secondaire', options: schoolData.options, classes: schoolData.classes }]);
+            renderClassesAccordion();
+            showModule('class-list');
+        }
+
+        function renderClassesAccordion() {
+            const container = document.getElementById('classes-accordion-container');
+            container.innerHTML = "";
+            
+            // Dossier Base
+            container.innerHTML += `<div class="opt-folder">
+                <div class="opt-header" onclick="toggleFold('Base')">CYCLE DE BASE <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="opt-content" id="fold-Base" style="display:grid;">
+                    ${schoolData.classes.filter(c => c.option === 'Base').map(c => `<div class="card" style="padding:10px; font-size:12px;" onclick="openClass('${c.label}')">${c.label}</div>`).join('')}
+                </div>
+            </div>`;
+
+            // Dossiers Options
+            schoolData.options.forEach(opt => {
+                container.innerHTML += `<div class="opt-folder">
+                    <div class="opt-header" onclick="toggleFold('${opt}')">${opt.toUpperCase()} <i class="fa-solid fa-chevron-down"></i></div>
+                    <div class="opt-content" id="fold-${opt}">
+                        ${schoolData.classes.filter(c => c.option === opt).map(c => `<div class="card" style="padding:10px; font-size:12px;" onclick="openClass('${c.label}')">${c.label}</div>`).join('')}
+                    </div>
+                </div>`;
+            });
+        }
+
+        function toggleFold(id) {
+            const el = document.getElementById('fold-'+id);
+            el.style.display = el.style.display === 'grid' ? 'none' : 'grid';
+        }
+
+        // --- GESTION ÉLÈVES ---
+        async function openClass(label) {
+            currentClass = label;
+            document.getElementById('current-class-title').innerText = "Gestion : " + label;
+            showModule('student-entry');
+            loadStudents();
+        }
+
+        async function saveStudents() {
+            const text = document.getElementById('bulk-students').value;
+            const lines = text.split('\n').filter(l => l.trim() !== "");
+            const studentsToUpload = lines.map(line => {
+                const parts = line.split(',');
+                return { 
+                    fullname: parts[0].trim(), 
+                    birth_date: parts[1] ? parts[1].trim() : null,
+                    class_label: currentClass 
+                };
+            });
+
+            const { error } = await _supabase.from('students').insert(studentsToUpload);
+            if(!error) {
+                document.getElementById('bulk-students').value = "";
+                loadStudents();
+                alert("Élèves enregistrés avec succès !");
+            }
+        }
+
+        async function loadStudents() {
+            const { data } = await _supabase.from('students').select('*').eq('class_label', currentClass);
+            document.getElementById('count-stud').innerText = data ? data.length : 0;
+            const list = document.getElementById('student-list-display');
+            list.innerHTML = data ? data.map(s => `
+                <div class="student-item">
+                    <span><b>${s.fullname}</b></span>
+                    <span style="color:#888;">${s.birth_date || 'N/A'}</span>
+                </div>
+            `).join('') : "";
         }
     </script>
 </body>
