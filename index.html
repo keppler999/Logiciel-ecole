@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite Platinum | Direction V2.2</title>
+    <title>Scholarite | Gestion Direction</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,214 +13,174 @@
 
         :root {
             --gold: #D4AF37; --black: #000000; --white: #FFFFFF;
-            --gray: #F4F4F4; --border: #EAEAEA; --text-light: #888;
+            --gray: #F4F4F4; --border: #EAEAEA;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--white); color: var(--black); transition: 0.5s; overflow-x: hidden; }
+        body { background: var(--white); color: var(--black); }
 
-        /* --- NAVIGATION & PORTAIL --- */
-        #portal-view { padding: 50px 5%; text-align: center; }
-        .logo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 60px; justify-content: center; }
-        .logo-sq { width: 45px; height: 45px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 800; border: 1px solid var(--gold); }
+        /* --- DASHBOARD PRINCIPAL --- */
+        #main-dashboard { display: none; min-height: 100vh; }
+        .sidebar { width: 280px; border-right: 1px solid var(--border); padding: 30px; height: 100vh; position: fixed; }
+        .content { margin-left: 280px; padding: 40px; }
+
+        /* --- LOGO UPLOADER --- */
+        .logo-placeholder { 
+            width: 120px; height: 120px; border: 2px dashed var(--border); 
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; margin-bottom: 20px;
+        }
+        .logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- CLASSE CARDS --- */
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .class-card { 
+            padding: 20px; border: 1px solid var(--border); border-radius: 15px; 
+            cursor: pointer; transition: 0.3s; background: #fff;
+        }
+        .class-card:hover { border-color: var(--gold); background: var(--gray); }
+
+        /* --- MODAL ELEVES --- */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 25px; width: 500px; max-height: 80vh; overflow-y: auto; }
+
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); }
+        .btn { padding: 12px 25px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-black { background: #000; color: var(--gold); width: 100%; }
         
-        .grid-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 40px auto; }
-        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; background: #fff; text-align: center; }
-        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
-        .card i { font-size: 35px; margin-bottom: 15px; display: block; color: var(--black); }
-
-        /* --- DASHBOARD --- */
-        #director-view { display: none; min-height: 100vh; flex-direction: column; }
-        .dir-header { padding: 20px 5%; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; position: sticky; top: 0; z-index: 100; }
-        .dir-container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
-        
-        .dir-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
-        .dir-item { background: var(--white); border: 1px solid var(--border); padding: 40px 20px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .dir-item:hover { border-color: var(--gold); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .dir-item i { font-size: 40px; color: var(--black); margin-bottom: 20px; }
-        .dir-item h3 { text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; font-weight: 800; }
-
-        /* --- MODULE ECOLE & ACCORDEONS --- */
-        #school-view { display: none; padding-bottom: 100px; }
-        .option-box { padding: 15px; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        
-        .opt-folder { border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 15px; transition: 0.3s; }
-        .opt-folder-header { padding: 20px; background: var(--gray); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .opt-folder-content { display: none; padding: 20px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; background: white; border-top: 1px solid var(--border); }
-
-        /* --- UI ELEMENTS --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: #fff; padding: 40px; border-radius: 30px; width: 400px; border: 1px solid var(--gold); }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; }
-        .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        .badge-cycle { font-size: 10px; letter-spacing: 1px; color: var(--text-light); text-transform: uppercase; margin-bottom: 15px; display: block; font-weight: 800; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
-    <div id="portal-view">
-        <div class="logo-header"><div class="logo-sq">S</div><h2>SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h2></div>
-        <h1>Administration Centrale</h1>
-        <div class="grid-roles">
-            <div class="card" onclick="openReg('Directeur des Études')"><i class="fa-solid fa-user-tie"></i><h3>Directeur</h3></div>
-            <div class="card" onclick="alert('Bientôt')"><i class="fa-solid fa-crown"></i><h3>Promoteur</h3></div>
-            <div class="card" onclick="alert('Bientôt')"><i class="fa-solid fa-wallet"></i><h3>Comptable</h3></div>
-            <div class="card" onclick="alert('Bientôt')"><i class="fa-solid fa-chalkboard-user"></i><h3>Professeur</h3></div>
-        </div>
+    <div id="portal-view" style="padding: 100px; text-align: center;">
+        <h1 style="font-weight: 800; font-size: 40px;">SCHOLARITE</h1>
+        <p>Système de gestion scolaire RDC</p>
+        <button class="btn btn-black" style="width: 200px; margin-top: 20px;" onclick="demoLogin()">ENTRER (ACCÈS DIRECTEUR)</button>
     </div>
 
-    <div id="director-view">
-        <header class="dir-header">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="logo-sq" style="width:35px; height:35px; font-size:16px;">S</div>
-                <span style="font-weight:800; font-size:13px;">PLATINUM <span style="color:var(--gold)">DIRECTOR</span></span>
+    <div id="main-dashboard">
+        <aside class="sidebar">
+            <div id="logo-zone" onclick="document.getElementById('file-input').click()">
+                <div class="logo-placeholder" id="logo-view">
+                    <i class="fa-solid fa-camera" id="cam-icon"></i>
+                </div>
+                <input type="file" id="file-input" hidden onchange="uploadLogo(event)">
             </div>
-            <div id="dir-name-label" style="font-size:11px; font-weight:700; background: var(--gray); padding:8px 15px; border-radius:20px; text-transform:uppercase;">ADMIN</div>
-        </header>
-
-        <div class="dir-container">
-            <h1 style="font-size: 26px; margin-bottom: 30px;">Configuration Système</h1>
-            <div class="dir-grid">
-                <div class="dir-item" onclick="openModule('school')"><i class="fa-solid fa-school"></i><h3>École</h3></div>
-                <div class="dir-item" onclick="alert('Bientôt')"><i class="fa-solid fa-users-gear"></i><h3>Professeurs</h3></div>
-                <div class="dir-item" onclick="alert('Bientôt')"><i class="fa-solid fa-box-archive"></i><h3>Archives</h3></div>
-                <div class="dir-item" onclick="alert('Bientôt')"><i class="fa-solid fa-book-open"></i><h3>Programme</h3></div>
-            </div>
-            <button onclick="location.reload()" style="margin-top:40px; border:none; background:none; cursor:pointer; color:#ccc; font-weight:700;">DÉCONNEXION</button>
-        </div>
-    </div>
-
-    <div id="school-view" class="dir-container">
-        <button onclick="openModule('dashboard')" style="background:none; border:none; cursor:pointer; font-weight:800; margin-bottom:20px;">
-            <i class="fa-solid fa-arrow-left"></i> RETOUR
-        </button>
-
-        <div id="step-section">
-            <h2 style="margin-bottom:20px;">Choisir la section</h2>
-            <div class="dir-grid">
-                <div class="dir-item" style="border-color:var(--gold);" onclick="selectSection('Secondaire')"><i class="fa-solid fa-user-graduate"></i><h3>Secondaire</h3></div>
-                <div class="dir-item" style="opacity:0.5;"><i class="fa-solid fa-child"></i><h3>Primaire</h3></div>
-            </div>
-        </div>
-
-        <div id="step-options" style="display:none; margin-top:30px;">
-            <h3 style="margin-bottom:20px;">Options disponibles au Secondaire</h3>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px;" id="options-list"></div>
-            <button class="btn-black" style="margin-top:30px; width:auto; padding:15px 40px;" onclick="saveAndGenerateClasses()">GÉNÉRER L'ARCHITECTURE</button>
-        </div>
-
-        <div id="step-final" style="display:none; margin-top:30px;">
-            <h2 style="color:var(--gold); margin-bottom:10px;">Structure Validée</h2>
-            <p style="color:var(--text-light); margin-bottom:30px; font-size:14px;">Les classes ont été organisées par cycle et par option.</p>
+            <h2 id="school-name" style="font-size: 18px; margin-bottom: 5px;">ÉCOLE PLATINUM</h2>
+            <p style="font-size: 12px; color: #888; margin-bottom: 30px;">Direction des Études</p>
             
-            <span class="badge-cycle">Cycle de Base (EB)</span>
-            <div id="base-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:15px; margin-bottom:40px;"></div>
+            <nav>
+                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer;"><i class="fa-solid fa-gauge" style="margin-right: 10px;"></i> Dashboard</div>
+                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer; color: var(--gold);"><i class="fa-solid fa-school" style="margin-right: 10px;"></i> Mes Classes</div>
+                <div style="margin-bottom: 15px; font-weight: 700; font-size: 14px; cursor: pointer;"><i class="fa-solid fa-user-tie" style="margin-right: 10px;"></i> Professeurs</div>
+            </nav>
+        </aside>
 
-            <span class="badge-cycle">Cycle des Humanités</span>
-            <div id="options-accordion"></div>
-            
-            <button class="btn-black" onclick="openModule('dashboard')" style="margin-top:40px;">TERMINER LA CONFIGURATION</button>
-        </div>
+        <main class="content">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                <h1>Gestion des Classes</h1>
+                <div id="date-now" style="font-weight: 600; font-size: 14px;"></div>
+            </header>
+
+            <section id="classes-section">
+                <h3 style="margin-bottom: 10px;">Éducation de Base (7e - 8e)</h3>
+                <div class="class-grid" id="grid-base">
+                    <div class="class-card" onclick="openClass('7ème EB')"><h4>7ème EB</h4><small>0 Élèves</small></div>
+                    <div class="class-card" onclick="openClass('8ème EB')"><h4>8ème EB</h4><small>0 Élèves</small></div>
+                </div>
+
+                <h3 style="margin-top: 40px; margin-bottom: 10px;">Humanités (1ère - 4ème)</h3>
+                <div class="class-grid" id="grid-humanites">
+                    <div class="class-card" onclick="openClass('1ère Électricité')"><h4>1ère Élec</h4><small>0 Élèves</small></div>
+                    <div class="class-card" onclick="openClass('1ère Commerciale')"><h4>1ère Comm</h4><small>0 Élèves</small></div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <div class="modal" id="reg-modal">
+    <div class="modal" id="class-modal">
         <div class="modal-box">
-            <h2>Créer l'accès</h2>
-            <input type="text" id="reg-name" placeholder="Nom du Directeur">
-            <input type="password" id="reg-pass" placeholder="Mot de passe">
-            <button class="btn-black" onclick="handleDirectorSignup()">CRÉER MON PROFIL</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modal-class-title">Classe</h2>
+                <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeModal()"></i>
+            </div>
+            
+            <div style="background: var(--gray); padding: 20px; border-radius: 15px;">
+                <h4 style="margin-bottom: 10px;">Inscrire un élève</h4>
+                <input type="text" id="stud-name" placeholder="Nom Complet de l'élève">
+                <input type="text" id="stud-id" placeholder="ID / Matricule (Optionnel)">
+                <button class="btn btn-black" style="margin-top: 10px;" onclick="addStudent()">INSCRIRE L'ÉLÈVE</button>
+            </div>
+
+            <table id="student-table">
+                <thead>
+                    <tr><th>Nom de l'élève</th><th>Matricule</th></tr>
+                </thead>
+                <tbody id="student-list">
+                    </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        const SB_URL = "https://dztbxntfsouuyrrigaah.supabase.co"; 
-        const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+        // Initialisation Date
+        document.getElementById('date-now').innerText = new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        let configEcole = { section: '', options: [] };
-        const optList = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction Bâtiment", "Commercial", "Électricité", "Électronique", "Mécanique", "Coupe-Couture", "Nutrition"];
+        let currentClass = "";
+        let db_students = {}; // Simulation locale pour le moment
 
-        function openModule(mod) {
+        function demoLogin() {
             document.getElementById('portal-view').style.display = 'none';
-            document.getElementById('director-view').style.display = mod === 'dashboard' ? 'flex' : 'none';
-            document.getElementById('school-view').style.display = mod === 'school' ? 'block' : 'none';
+            document.getElementById('main-dashboard').style.display = 'flex';
         }
 
-        function openReg(role) { document.getElementById('reg-modal').style.display = 'flex'; }
-
-        async function handleDirectorSignup() {
-            const n = document.getElementById('reg-name').value;
-            const p = document.getElementById('reg-pass').value;
-            if(!n || !p) return;
-            const { error } = await _supabase.from('profiles').insert([{ full_name: n, password: p, role: 'Directeur' }]);
-            if(!error) { 
-                document.getElementById('reg-modal').style.display = 'none';
-                document.getElementById('dir-name-label').innerText = n;
-                openModule('dashboard'); 
+        // --- GESTION LOGO ---
+        function uploadLogo(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('logo-view').innerHTML = `<img src="${e.target.result}">`;
             }
+            reader.readAsDataURL(file);
         }
 
-        function selectSection(sec) {
-            configEcole.section = sec;
-            document.getElementById('step-section').style.display = 'none';
-            const list = document.getElementById('options-list');
-            list.innerHTML = optList.map(o => `<label class="option-box"><input type="checkbox" value="${o}"> <span>${o}</span></label>`).join('');
-            document.getElementById('step-options').style.display = 'block';
+        // --- GESTION CLASSES & ELEVES ---
+        function openClass(className) {
+            currentClass = className;
+            document.getElementById('modal-class-title').innerText = className;
+            document.getElementById('class-modal').style.display = 'flex';
+            renderStudents();
         }
 
-        async function saveAndGenerateClasses() {
-            const checks = document.querySelectorAll('#options-list input:checked');
-            configEcole.options = Array.from(checks).map(c => c.value);
+        function closeModal() {
+            document.getElementById('class-modal').style.display = 'none';
+        }
+
+        function addStudent() {
+            const name = document.getElementById('stud-name').value;
+            const id = document.getElementById('stud-id').value || "S-" + Math.floor(Math.random()*1000);
             
-            let structure = [
-                { label: "7ème Éducation de Base", option: "Tronc Commun", cycle: "Base" },
-                { label: "8ème Éducation de Base", option: "Tronc Commun", cycle: "Base" }
-            ];
+            if(!name) return alert("Nom requis");
 
-            configEcole.options.forEach(opt => {
-                for(let i=1; i<=4; i++) {
-                    structure.push({ label: i + (i==1?'ère':'ème') + " " + opt, option: opt, cycle: "Humanités" });
-                }
-            });
+            if(!db_students[currentClass]) db_students[currentClass] = [];
+            db_students[currentClass].push({name, id});
 
-            const { error } = await _supabase.from('school_config').insert([{ section: 'Secondaire', options: configEcole.options, classes: structure }]);
-            if(!error) renderOrganizedClasses(structure);
+            document.getElementById('stud-name').value = "";
+            document.getElementById('stud-id').value = "";
+            renderStudents();
         }
 
-        function renderOrganizedClasses(classes) {
-            document.getElementById('step-options').style.display = 'none';
-            document.getElementById('step-final').style.display = 'block';
-
-            document.getElementById('base-grid').innerHTML = classes.filter(c => c.cycle === "Base").map(c => `
-                <div style="padding:20px; border:1px solid var(--border); border-radius:15px; font-weight:700; font-size:14px; background:white;">
-                    <i class="fa-solid fa-graduation-cap" style="color:var(--gold); margin-right:10px;"></i> ${c.label}
-                </div>
-            `).join('');
-
-            const accordion = document.getElementById('options-accordion');
-            accordion.innerHTML = "";
-            configEcole.options.forEach(opt => {
-                const optClasses = classes.filter(c => c.option === opt);
-                const folder = document.createElement('div');
-                folder.className = "opt-folder";
-                folder.innerHTML = `
-                    <div class="opt-folder-header" onclick="toggleOpt('${opt}')">
-                        <span style="font-weight:800; font-size:12px;"><i class="fa-solid fa-folder-open" style="color:var(--gold); margin-right:10px;"></i> ${opt.toUpperCase()}</span>
-                        <i class="fa-solid fa-chevron-down" id="icon-${opt}"></i>
-                    </div>
-                    <div class="opt-folder-content" id="content-${opt}">
-                        ${optClasses.map(c => `<div style="padding:15px; border:1px solid var(--gray); border-radius:12px; font-size:13px; font-weight:600; text-align:center;">${c.label}</div>`).join('')}
-                    </div>`;
-                accordion.appendChild(folder);
+        function renderStudents() {
+            const list = document.getElementById('student-list');
+            list.innerHTML = "";
+            const students = db_students[currentClass] || [];
+            
+            students.forEach(s => {
+                list.innerHTML += `<tr><td>${s.name}</td><td>${s.id}</td></tr>`;
             });
-        }
-
-        function toggleOpt(opt) {
-            const c = document.getElementById(`content-${opt}`);
-            const i = document.getElementById(`icon-${opt}`);
-            const isHidden = c.style.display === "none" || c.style.display === "";
-            c.style.display = isHidden ? "grid" : "none";
-            i.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
         }
     </script>
 </body>
