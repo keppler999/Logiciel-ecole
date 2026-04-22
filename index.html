@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite Platinum | Portail Unifié</title>
+    <title>Scholarite Platinum | Direction</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,179 +12,148 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
 
         :root {
-            --gold: #D4AF37;
-            --black: #000000;
-            --white: #FFFFFF;
-            --gray: #F8F9FA;
-            --text-dark: #1A1A1A;
-            --border: #E0E0E0;
+            --gold: #D4AF37; --black: #000000; --white: #FFFFFF;
+            --gray: #F4F4F4; --border: #EAEAEA;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--white); color: var(--text-dark); overflow-x: hidden; }
+        body { background: var(--white); color: var(--black); transition: 0.5s; }
 
-        /* --- HEADER --- */
-        header { padding: 20px 5%; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-circle { 
-            width: 40px; height: 40px; background: var(--black); color: var(--gold); 
-            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
-            font-weight: 800; font-size: 20px; border: 1px solid var(--gold);
-        }
-        .logo-text { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--black); }
+        /* --- PORTAIL D'ACCUEIL --- */
+        #portal-view { padding: 50px 5%; text-align: center; }
+        .logo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 60px; justify-content: center; }
+        .logo-sq { width: 45px; height: 45px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 800; border: 1px solid var(--gold); }
+        
+        .grid-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 40px auto; }
+        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+        .card i { font-size: 35px; margin-bottom: 15px; display: block; }
 
-        /* --- HERO SECTION --- */
-        .hero { padding: 80px 5%; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 20px; color: var(--black); }
-        .hero p { font-size: 18px; color: #666; line-height: 1.6; }
-
-        /* --- RUBRIQUES GRID --- */
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 25px; padding: 40px 5%; max-width: 1200px; margin: 0 auto; 
+        /* --- INTERFACE DIRECTEUR (MASQUÉE PAR DÉFAUT) --- */
+        #director-view { display: none; height: 100vh; flex-direction: column; }
+        .dir-header { padding: 20px 5%; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
+        .dir-container { padding: 60px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .dir-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        
+        .dir-item { 
+            background: var(--white); border: 1px solid var(--border); padding: 50px 30px; 
+            border-radius: 30px; text-align: center; cursor: pointer; transition: 0.4s;
         }
-        .role-card { 
-            background: var(--white); border: 1px solid var(--border); padding: 40px 20px; 
-            border-radius: 24px; text-align: center; cursor: pointer; transition: 0.3s;
-        }
-        .role-card:hover { 
-            border-color: var(--gold); transform: translateY(-10px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05); 
-        }
-        .role-card i { font-size: 40px; color: var(--black); margin-bottom: 20px; transition: 0.3s; }
-        .role-card:hover i { color: var(--gold); }
-        .role-card h3 { font-size: 16px; font-weight: 700; color: var(--black); text-transform: uppercase; letter-spacing: 1px; }
+        .dir-item:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+        .dir-item i { font-size: 45px; color: var(--gold); margin-bottom: 25px; }
+        .dir-item h3 { text-transform: uppercase; letter-spacing: 2px; font-size: 14px; }
 
         /* --- MODAL --- */
-        .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
-            backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; 
-        }
-        .modal-box { 
-            background: var(--white); padding: 40px; border-radius: 30px; width: 400px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1); border: 1px solid var(--gold);
-        }
-        .modal-box h2 { margin-bottom: 10px; font-size: 24px; }
-        .modal-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
-        
-        input { 
-            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; 
-            border: 1px solid var(--border); background: var(--gray); font-size: 14px;
-        }
-        .btn-action { 
-            width: 100%; padding: 15px; border-radius: 12px; border: none; 
-            background: var(--black); color: var(--gold); font-weight: 700; cursor: pointer;
-        }
-        .btn-action:hover { background: #222; }
-
-        #status-msg { margin-top: 15px; font-size: 12px; text-align: center; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; padding: 40px; border-radius: 30px; width: 400px; border: 1px solid var(--gold); }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); }
+        .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area">
-            <div class="logo-circle">S</div>
-            <div class="logo-text">SCHOLARITE <span style="color: var(--gold);">PLATINUM</span></div>
+    <div id="portal-view">
+        <div class="logo-header">
+            <div class="logo-sq">S</div>
+            <h2 style="letter-spacing: -1px;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h2>
         </div>
-    </header>
+        <h1 style="font-size: 36px; margin-bottom: 15px;">Bienvenue dans le centre de contrôle.</h1>
+        <p style="color: #777; margin-bottom: 40px;">Sélectionnez votre profil pour accéder aux outils de gestion.</p>
 
-    <section class="hero">
-        <h1>L'excellence au cœur de votre établissement scolaire.</h1>
-        <p>Une architecture numérique robuste pour piloter la finance, la pédagogie et la discipline en temps réel. Choisissez votre profil pour commencer.</p>
-    </section>
-
-    <div class="grid-container">
-        <div class="role-card" onclick="openProfile('Promoteur')">
-            <i class="fa-solid fa-crown"></i>
-            <h3>Promoteur</h3>
-        </div>
-        <div class="role-card" onclick="openProfile('Directeur des Études')">
-            <i class="fa-solid fa-user-tie"></i>
-            <h3>Directeur</h3>
-        </div>
-        <div class="role-card" onclick="openProfile('Comptable')">
-            <i class="fa-solid fa-wallet"></i>
-            <h3>Comptable</h3>
-        </div>
-        <div class="role-card" onclick="openProfile('Professeur')">
-            <i class="fa-solid fa-chalkboard-user"></i>
-            <h3>Professeur</h3>
-        </div>
-        <div class="role-card" onclick="openProfile('Parent / Élève')">
-            <i class="fa-solid fa-users"></i>
-            <h3>Parents / Élèves</h3>
+        <div class="grid-roles">
+            <div class="card" onclick="openReg('Directeur des Études')"><i class="fa-solid fa-user-tie"></i><h3>Directeur</h3></div>
+            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-crown"></i><h3>Promoteur</h3></div>
+            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-wallet"></i><h3>Comptable</h3></div>
+            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-chalkboard-user"></i><h3>Professeur</h3></div>
+            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-users"></i><h3>Parents</h3></div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="profile-modal">
+    <div id="director-view">
+        <header class="dir-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="logo-sq" style="width:35px; height:35px; font-size:16px;">S</div>
+                <span style="font-weight:800; font-size:14px;">PLATINUM <span style="color:var(--gold)">DIRECTOR</span></span>
+            </div>
+            <div id="user-display" style="font-size:12px; font-weight:600; border:1px solid var(--border); padding:8px 15px; border-radius:20px;">
+                Directeur: <span id="dir-name-label">En attente...</span>
+            </div>
+        </header>
+
+        <div class="dir-container">
+            <div style="margin-bottom: 50px;">
+                <h1 style="font-size: 28px;">Configuration Système</h1>
+                <p style="color:#888;">Modérez et organisez les paramètres de votre établissement.</p>
+            </div>
+
+            <div class="dir-grid">
+                <div class="dir-item" onclick="alert('Configuration École')">
+                    <i class="fa-solid fa-school"></i>
+                    <h3>École</h3>
+                </div>
+                <div class="dir-item" onclick="alert('Gestion Professeurs')">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <h3>Professeurs</h3>
+                </div>
+                <div class="dir-item" onclick="alert('Accès Archives')">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <h3>Archives</h3>
+                </div>
+                <div class="dir-item" onclick="alert('Édition Programme')">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h3>Programme</h3>
+                </div>
+                <div class="dir-item" onclick="alert('Paramètres')">
+                    <i class="fa-solid fa-sliders"></i>
+                    <h3>Paramètres</h3>
+                </div>
+                <div class="dir-item" onclick="location.reload()">
+                    <i class="fa-solid fa-power-off"></i>
+                    <h3>Quitter</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="reg-modal">
         <div class="modal-box">
-            <h2 id="modal-role-title">Créer Profil</h2>
-            <p>Initialisation de votre accès sécurisé.</p>
-            
-            <input type="text" id="user-fullname" placeholder="Nom complet">
-            <input type="password" id="user-pass" placeholder="Mot de passe">
-            
-            <button class="btn-action" onclick="saveProfile()">CRÉER MON PROFIL</button>
-            <p id="status-msg"></p>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#999; cursor:pointer; font-size:12px;">Annuler</button>
+            <h2 id="role-title">Créer un compte</h2>
+            <p style="font-size:13px; color:#777; margin-bottom:20px;">Identifiants de modération requis.</p>
+            <input type="text" id="reg-name" placeholder="Nom complet">
+            <input type="password" id="reg-pass" placeholder="Mot de passe">
+            <button class="btn-black" onclick="handleDirectorSignup()">CRÉER L'ACCÈS</button>
+            <button onclick="document.getElementById('reg-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:15px; color:#aaa; cursor:pointer;">Annuler</button>
         </div>
     </div>
 
     <script>
-        // --- NOUVELLES CLÉS SUPABASE ---
         const SB_URL = "https://chpydetdbfugwwhsvgin.supabase.co"; 
         const SB_KEY = "sb_publishable_G3rNGdnIihPNVfaLj1C4VQ_1TUBFh_z"; 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        let selectedRole = "";
-
-        function openProfile(role) {
-            selectedRole = role;
-            document.getElementById('modal-role-title').innerText = "Profil " + role;
-            document.getElementById('profile-modal').style.display = 'flex';
+        function openReg(role) {
+            document.getElementById('role-title').innerText = "Accès " + role;
+            document.getElementById('reg-modal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('profile-modal').style.display = 'none';
-        }
+        async function handleDirectorSignup() {
+            const name = document.getElementById('reg-name').value;
+            const pass = document.getElementById('reg-pass').value;
 
-        async function saveProfile() {
-            const name = document.getElementById('user-fullname').value;
-            const pass = document.getElementById('user-pass').value;
-            const msg = document.getElementById('status-msg');
+            if(!name || !pass) return alert("Champs requis");
 
-            if(!name || !pass) {
-                msg.style.color = "red";
-                msg.innerText = "Veuillez remplir tous les champs.";
-                return;
-            }
-
-            msg.style.color = "var(--black)";
-            msg.innerText = "Enregistrement en cours...";
-
-            // Sauvegarde dans une table 'utilisateurs'
-            const { error } = await _supabase.from('profiles').insert([
-                { 
-                    full_name: name, 
-                    password: pass, // Note: Dans un vrai système, on hacherait le mot de passe
-                    role: selectedRole,
-                    created_at: new Date()
-                }
-            ]);
+            const { error } = await _supabase.from('profiles').insert([{ full_name: name, password: pass, role: 'Directeur' }]);
 
             if(!error) {
-                msg.style.color = "green";
-                msg.innerText = "Profil créé avec succès ! Bienvenue.";
-                setTimeout(() => {
-                    closeModal();
-                    // Ici on pourra rediriger vers le module spécifique plus tard
-                    alert("Redirection vers l'espace " + selectedRole + " bientôt disponible.");
-                }, 1500);
+                // Succès : On cache le portail et on montre l'interface Directeur
+                document.getElementById('reg-modal').style.display = 'none';
+                document.getElementById('portal-view').style.display = 'none';
+                document.getElementById('director-view').style.display = 'flex';
+                document.getElementById('dir-name-label').innerText = name;
+                document.body.style.backgroundColor = "#fff"; 
             } else {
-                msg.style.color = "red";
-                msg.innerText = "Erreur : " + error.message;
+                alert("Erreur: " + error.message);
             }
         }
     </script>
