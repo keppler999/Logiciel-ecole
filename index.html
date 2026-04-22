@@ -3,129 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite | Système de Gestion Intégré</title>
+    <title>Scholarite Platinum | Système Expert</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        :root { --gold: #D4AF37; --black: #000000; --white: #FFFFFF; --gray: #F4F4F4; --border: #EAEAEA; }
+        :root { --gold: #D4AF37; --black: #000000; --white: #FFFFFF; --gray: #F8F9FA; --border: #EEEEEE; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--white); color: var(--black); overflow-x: hidden; }
+        body { background: var(--white); color: var(--black); }
 
-        /* HEADER PREMIUM */
+        /* HEADER & NAV */
         header { padding: 15px 5%; display: none; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: #fff; position: sticky; top: 0; z-index: 1000; }
-        .logo-box { display: flex; align-items: center; gap: 10px; font-weight: 800; }
-        .logo-sq { width: 35px; height: 35px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--gold); }
+        .logo-sq { width: 35px; height: 35px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 800; border: 1px solid var(--gold); }
         
-        /* VUES */
-        .view { display: none; padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
+        .view { display: none; padding: 30px 5%; max-width: 1400px; margin: 0 auto; }
         .active { display: block; }
 
-        /* CARTES ET GRILLES */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
-        .card { padding: 40px 20px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; text-align: center; background: #fff; }
-        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .card i { font-size: 35px; margin-bottom: 20px; color: var(--black); }
-        .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        /* TABLEAU STYLISÉ */
+        .student-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        .student-table th { text-align: left; padding: 15px; background: var(--gray); color: #888; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+        .student-table td { padding: 15px; border-bottom: 1px solid var(--border); }
+        .student-table tr:nth-child(even) td:nth-child(odd), 
+        .student-table tr:nth-child(odd) td:nth-child(even) { background-color: rgba(212, 175, 55, 0.02); }
+        
+        .sticker-casier { 
+            background: var(--black); color: var(--gold); padding: 5px 12px; border-radius: 20px; 
+            font-size: 10px; font-weight: 800; cursor: pointer; border: 1px solid var(--gold);
+            display: inline-flex; align-items: center; gap: 5px; transition: 0.3s;
+        }
+        .sticker-casier:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
 
-        /* OPTIONS & CLASSES */
-        .opt-folder { border: 1px solid var(--border); border-radius: 20px; margin-bottom: 15px; overflow: hidden; }
-        .opt-header { padding: 20px; background: var(--gray); cursor: pointer; display: flex; justify-content: space-between; font-weight: 800; font-size: 12px; }
-        .opt-content { display: none; padding: 20px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; background: #fff; border-top: 1px solid var(--border); }
-        .class-badge { padding: 15px; border: 1px solid var(--border); border-radius: 12px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; }
-        .class-badge:hover { border-color: var(--gold); background: #fffcf0; }
+        /* CASIER MODALE */
+        .casier-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); display: none; z-index: 3000; padding: 40px; overflow-y: auto; }
+        .casier-modal { background: #fff; max-width: 1000px; margin: 0 auto; border-radius: 30px; overflow: hidden; position: relative; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* FORMULAIRES */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-box { background: #fff; padding: 40px; border-radius: 30px; width: 400px; border: 1px solid var(--gold); }
-        input, textarea { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; }
-        textarea { height: 150px; resize: none; }
-        .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .casier-header { background: var(--black); color: #fff; padding: 40px; display: flex; gap: 30px; align-items: center; }
+        .profile-pic { width: 120px; height: 120px; background: var(--gold); border-radius: 20px; object-fit: cover; border: 3px solid var(--gold); }
+        
+        .casier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 40px; }
+        .info-group { margin-bottom: 25px; }
+        .info-group label { display: block; font-size: 10px; color: var(--gold); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .info-group p { font-size: 15px; font-weight: 600; }
+
+        /* INPUTS & BOUTONS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .card { padding: 30px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .card:hover { border-color: var(--gold); background: var(--gray); }
+        textarea { width: 100%; height: 120px; padding: 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--gray); margin-bottom: 20px; }
+        .btn-gold { background: #000; color: var(--gold); padding: 15px 35px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <header id="main-nav">
-        <div class="logo-box"><div class="logo-sq">S</div><span>SCHOLARITE</span></div>
-        <div style="display:flex; align-items:center; gap:20px;">
-            <div id="school-logo-zone" onclick="document.getElementById('logo-file').click()" style="cursor:pointer; display:flex; align-items:center; gap:10px; background:var(--gray); padding:5px 15px; border-radius:10px;">
-                <span id="logo-text" style="font-size:10px; font-weight:700;">+ LOGO ÉCOLE</span>
-                <img id="logo-preview" style="display:none; height:30px; border-radius:4px;">
-                <input type="file" id="logo-file" hidden accept="image/*" onchange="uploadLogo(event)">
+    <header id="top-nav">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="logo-sq">S</div>
+            <span style="font-weight:800; letter-spacing:-0.5px;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></span>
+        </div>
+        <div id="school-identity" style="display:flex; align-items:center; gap:20px;">
+            <div onclick="document.getElementById('file-logo').click()" style="cursor:pointer; background:var(--gray); padding:8px 15px; border-radius:12px; font-size:11px; font-weight:800;">
+                <span id="txt-logo">+ LOGO ÉCOLE</span>
+                <img id="img-logo" style="display:none; height:30px;">
+                <input type="file" id="file-logo" hidden onchange="upLogo(event)">
             </div>
-            <div id="user-tag" style="font-size:11px; font-weight:800; color:var(--gold); text-transform:uppercase;"></div>
+            <span id="user-display" style="text-transform:uppercase; font-size:11px; font-weight:800; color:var(--gold);"></span>
         </div>
     </header>
 
-    <div id="view-portal" class="view active" style="text-align: center; padding-top: 80px;">
-        <div class="logo-sq" style="margin: 0 auto 20px; width: 60px; height: 60px; font-size: 30px;">S</div>
-        <h1 style="font-size: 35px; letter-spacing: -1px;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h1>
-        <p style="color: #888; margin-bottom: 50px;">Gestion intelligente pour les écoles de la RDC</p>
+    <div id="view-portal" class="view active" style="text-align:center; padding-top:100px;">
+        <h1 style="font-size:45px; margin-bottom:10px;">Scholarite</h1>
+        <p style="color:#888; margin-bottom:50px;">L'excellence administrative pour la RDC</p>
+        <div class="grid" style="max-width:900px; margin:0 auto;">
+            <div class="card" onclick="openGate('Directeur')"><i class="fa-solid fa-user-tie" style="font-size:30px;"></i><h3>Direction</h3></div>
+            <div class="card" onclick="alert('Bientôt')"><i class="fa-solid fa-crown" style="font-size:30px;"></i><h3>Promoteur</h3></div>
+            <div class="card" onclick="alert('Bientôt')"><i class="fa-solid fa-wallet" style="font-size:30px;"></i><h3>Comptabilité</h3></div>
+        </div>
+    </div>
+
+    <div id="view-dash" class="view">
         <div class="grid">
-            <div class="card" onclick="openLogin('Directeur')"><i class="fa-solid fa-user-tie"></i><h3>Directeur</h3></div>
-            <div class="card" onclick="alert('Module Promoteur en attente')"><i class="fa-solid fa-crown"></i><h3>Promoteur</h3></div>
-            <div class="card" onclick="alert('Module Comptable en attente')"><i class="fa-solid fa-wallet"></i><h3>Comptable</h3></div>
-            <div class="card" onclick="alert('Module Professeur en attente')"><i class="fa-solid fa-chalkboard-user"></i><h3>Professeur</h3></div>
+            <div class="card" onclick="show('config')"><i class="fa-solid fa-school"></i><h3>Configuration</h3></div>
+            <div class="card" onclick="show('classes')"><i class="fa-solid fa-users"></i><h3>Classes & Élèves</h3></div>
+            <div class="card"><i class="fa-solid fa-chart-line"></i><h3>Performances</h3></div>
         </div>
     </div>
 
-    <div id="view-director-main" class="view">
-        <h2 style="font-size: 24px;">Tableau de Bord</h2>
-        <p style="color:#888; font-size:14px; margin-bottom:30px;">Gérez l'ensemble des activités de votre école.</p>
-        <div class="grid">
-            <div class="card" onclick="showModule('school-config')"><i class="fa-solid fa-school"></i><h3>École</h3></div>
-            <div class="card" onclick="showModule('teachers')"><i class="fa-solid fa-users-gear"></i><h3>Professeurs</h3></div>
-            <div class="card" onclick="showModule('archives')"><i class="fa-solid fa-box-archive"></i><h3>Archives</h3></div>
-            <div class="card" onclick="showModule('program')"><i class="fa-solid fa-book-open"></i><h3>Programme</h3></div>
-        </div>
-        <button onclick="location.reload()" style="margin-top:50px; background:none; border:none; color:#ccc; font-weight:800; cursor:pointer;">DÉCONNEXION</button>
+    <div id="view-config" class="view">
+        <button onclick="show('dash')" style="border:none; background:none; font-weight:800; cursor:pointer; margin-bottom:20px;">← RETOUR</button>
+        <h2>Initialisation du Secondaire</h2>
+        <div id="opt-grid" class="grid" style="margin-top:20px;"></div>
+        <button class="btn-gold" style="margin-top:30px;" onclick="buildArchitecture()">CRÉER LES CLASSES</button>
     </div>
 
-    <div id="view-school-config" class="view">
-        <button onclick="showModule('director-main')" style="border:none; background:none; font-weight:800; cursor:pointer; margin-bottom:20px;">← RETOUR</button>
-        <div id="config-step-1">
-            <h2>Configuration des Sections</h2>
-            <div class="grid">
-                <div class="card" style="border-color:var(--gold);" onclick="showOptions()"><i class="fa-solid fa-user-graduate"></i><h3>Secondaire</h3></div>
-                <div class="card" style="opacity:0.4;"><i class="fa-solid fa-child"></i><h3>Primaire</h3></div>
-                <div class="card" style="opacity:0.4;"><i class="fa-solid fa-baby"></i><h3>Maternelle</h3></div>
+    <div id="view-classes" class="view">
+        <button onclick="show('dash')" style="border:none; background:none; font-weight:800; cursor:pointer; margin-bottom:20px;">← RETOUR</button>
+        <div id="class-accordion"></div>
+    </div>
+
+    <div id="view-manage" class="view">
+        <button onclick="show('classes')" style="border:none; background:none; font-weight:800; cursor:pointer; margin-bottom:20px;">← RETOUR AUX CLASSES</button>
+        <h2 id="current-class-title" style="color:var(--gold); margin-bottom:30px;"></h2>
+        
+        <div style="background:var(--gray); padding:30px; border-radius:30px; margin-bottom:40px;">
+            <h4 style="margin-bottom:10px;">Saisie Rapide des Inscriptions</h4>
+            <p style="font-size:11px; color:#777; margin-bottom:15px;">FORMAT: NOM POSTNOM PRÉNOM, SEXE (M/F), DATE DE NAISSANCE</p>
+            <textarea id="bulk-area" placeholder="Ex: LUKEBA MUKENDI JEAN, M, 12/04/2009"></textarea>
+            <button class="btn-gold" onclick="bulkSave()">ENREGISTRER LA LISTE</button>
+        </div>
+
+        <table class="student-table">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Nom, Post-nom & Prénom</th>
+                    <th>Sexe</th>
+                    <th>Date de Naissance</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="student-rows"></tbody>
+        </table>
+    </div>
+
+    <div id="casier-view" class="casier-overlay">
+        <div class="casier-modal">
+            <button onclick="closeCasier()" style="position:absolute; right:20px; top:20px; background:none; border:none; color:#fff; font-size:25px; cursor:pointer; z-index:10;">&times;</button>
+            <div class="casier-header">
+                <img src="https://via.placeholder.com/150" class="profile-pic" id="c-pic">
+                <div>
+                    <h1 id="c-fullname" style="font-size:32px;">NOM DE L'ELEVE</h1>
+                    <p style="color:var(--gold); font-weight:800;" id="c-matricule">MATRICULE : SCH-2024-000</p>
+                    <div style="margin-top:10px; display:flex; gap:10px;">
+                        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:12px;" id="c-class">3e ELEC</span>
+                        <span style="background:var(--gold); color:#000; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:800;">ACTIF</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="config-step-2" style="display:none;">
-            <h3 style="margin-bottom:20px;">Options disponibles (RDC)</h3>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;" id="options-selector"></div>
-            <button class="btn-black" style="margin-top:30px; width:auto; padding:15px 40px;" onclick="saveAndBuildClasses()">VALIDER LES OPTIONS</button>
-        </div>
-        <div id="config-step-3" style="display:none;">
-            <h2 style="color:var(--gold); margin-bottom:20px;">Architecture des Classes</h2>
-            <div id="final-structure-display"></div>
-            <button class="btn-black" onclick="showModule('director-main')" style="margin-top:30px;">ACCÉDER AU PILOTAGE</button>
-        </div>
-    </div>
-
-    <div id="view-class-manager" class="view">
-        <button onclick="showModule('school-config')" style="border:none; background:none; font-weight:800; cursor:pointer; margin-bottom:20px;">← RETOUR AUX OPTIONS</button>
-        <h2 id="active-class-name" style="color:var(--gold);">Classe</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px; margin-top:30px;">
-            <div style="background:var(--gray); padding:30px; border-radius:25px;">
-                <h4>Saisie Fluide des Élèves</h4>
-                <p style="font-size:11px; color:#666; margin-bottom:10px;">NOM POSTNOM PRÉNOM, DATE DE NAISSANCE (Une ligne par élève)</p>
-                <textarea id="bulk-input" placeholder="Kambale Mputu Jean, 12/05/2010&#10;Kakule Marie, 08/09/2009"></textarea>
-                <button class="btn-black" onclick="processBulkStudents()">ENREGISTRER LA LISTE</button>
+            
+            <div class="casier-grid">
+                <div class="section">
+                    <h3 style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:20px;">Identité & Famille</h3>
+                    <div class="info-group"><label>Sexe</label><p id="c-sexe">-</p></div>
+                    <div class="info-group"><label>Né(e) le / à</label><p id="c-birth">-</p></div>
+                    <div class="info-group"><label>Nationalité</label><p>Congolaise (RDC)</p></div>
+                    <div class="info-group"><label>Parents / Tuteurs</label><p>Non renseigné</p></div>
+                </div>
+                <div class="section">
+                    <h3 style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:20px;">Finances & Académique</h3>
+                    <div class="info-group"><label>Frais Scolaires</label><p style="color:red;">Solde : 150 $ (En attente)</p></div>
+                    <div class="info-group"><label>Dernière Moyenne</label><p>65% (Satisfaisant)</p></div>
+                    <button class="btn-gold" style="width:100%;" onclick="alert('Génération du bulletin...')">TÉLÉCHARGER LE BULLETIN</button>
+                </div>
             </div>
-            <div>
-                <h4>Effectif : <span id="student-count">0</span></h4>
-                <div id="student-list" style="margin-top:20px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="login-modal">
-        <div class="modal-box">
-            <h2 id="login-role">Accès</h2>
-            <input type="text" id="user-name" placeholder="Nom">
-            <input type="password" id="user-pass" placeholder="Code Secret">
-            <button class="btn-black" onclick="doLogin()">ENTRER</button>
         </div>
     </div>
 
@@ -134,124 +164,102 @@
         const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentRole = "";
-        let selectedOptions = [];
-        let activeClassName = "";
-        const allOptions = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction Bâtiment", "Commercial", "Électricité", "Électronique", "Mécanique", "Coupe-Couture", "Nutrition"];
+        let activeClass = "";
+        const opts = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction Bâtiment", "Commercial", "Électricité", "Électronique", "Mécanique", "Coupe-Couture", "Nutrition"];
 
-        // NAVIGATION
-        function showModule(id) {
+        function show(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
-            if(id !== 'portal') document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('top-nav').style.display = 'flex';
         }
 
-        // LOGIN
-        function openLogin(role) {
-            currentRole = role;
-            document.getElementById('login-role').innerText = "Espace " + role;
-            document.getElementById('login-modal').style.display = 'flex';
+        function openGate(role) {
+            document.getElementById('user-display').innerText = role;
+            show('dash');
         }
 
-        async function doLogin() {
-            const n = document.getElementById('user-name').value;
-            const p = document.getElementById('user-pass').value;
-            if(!n || !p) return;
+        // INITIALISATION
+        const optGrid = document.getElementById('opt-grid');
+        optGrid.innerHTML = opts.map(o => `<label style="padding:15px; border:1px solid var(--border); border-radius:15px; cursor:pointer;"><input type="checkbox" value="${o}"> ${o}</label>`).join('');
 
-            const { error } = await _supabase.from('profiles').insert([{ full_name: n, password: p, role: currentRole }]);
-            if(!error) {
-                document.getElementById('login-modal').style.display = 'none';
-                document.getElementById('user-tag').innerText = n;
-                showModule('director-main');
-            }
+        async function buildArchitecture() {
+            const checks = document.querySelectorAll('#opt-grid input:checked');
+            const selected = Array.from(checks).map(c => c.value);
+            let classes = [{label: "7e EB", opt: "Base"}, {label: "8e EB", opt: "Base"}];
+            selected.forEach(o => ["1ere", "2e", "3e", "4e"].forEach(n => classes.push({label: `${n} ${o}`, opt: o})));
+            await _supabase.from('school_config').insert([{section:'Secondaire', options:selected, classes:classes}]);
+            renderAccordion(classes, selected);
+            show('classes');
         }
 
-        // LOGO
-        function uploadLogo(e) {
+        function renderAccordion(classes, selected) {
+            const acc = document.getElementById('class-accordion');
+            acc.innerHTML = "";
+            const groups = ["Base", ...selected];
+            groups.forEach(g => {
+                acc.innerHTML += `
+                    <div style="border:1px solid var(--border); border-radius:20px; margin-bottom:10px; overflow:hidden;">
+                        <div onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'grid' ? 'none' : 'grid'" style="padding:20px; background:var(--gray); cursor:pointer; font-weight:800; font-size:12px;">${g.toUpperCase()}</div>
+                        <div style="display:none; padding:20px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:15px;">
+                            ${classes.filter(c => c.opt === g).map(c => `<div class="card" style="padding:15px; font-size:12px;" onclick="manageClass('${c.label}')">${c.label}</div>`).join('')}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        async function manageClass(name) {
+            activeClass = name;
+            document.getElementById('current-class-title').innerText = name;
+            show('manage');
+            loadStudents();
+        }
+
+        async function bulkSave() {
+            const lines = document.getElementById('bulk-area').value.split('\n').filter(l => l.trim() !== "");
+            const students = lines.map(l => {
+                const p = l.split(',');
+                const mat = "SCH-" + Math.floor(1000 + Math.random() * 9000);
+                return { matricule: mat, fullname: p[0].trim(), sexe: p[1]?.trim() || '?', birth_date: p[2]?.trim() || 'N/A', class_label: activeClass };
+            });
+            await _supabase.from('students').insert(students);
+            document.getElementById('bulk-area').value = "";
+            loadStudents();
+        }
+
+        async function loadStudents() {
+            const { data } = await _supabase.from('students').select('*').eq('class_label', activeClass);
+            const tbody = document.getElementById('student-rows');
+            tbody.innerHTML = data.map((s, i) => `
+                <tr>
+                    <td style="font-weight:800; color:var(--gold);">${i + 1}</td>
+                    <td style="font-weight:700;">${s.fullname}</td>
+                    <td>${s.sexe}</td>
+                    <td>${s.birth_date}</td>
+                    <td><div class="sticker-casier" onclick="viewCasier('${s.id}')"><i class="fa-solid fa-folder"></i> CASIER</div></td>
+                </tr>`).join('');
+        }
+
+        async function viewCasier(id) {
+            const { data } = await _supabase.from('students').select('*').eq('id', id).single();
+            document.getElementById('c-fullname').innerText = data.fullname;
+            document.getElementById('c-matricule').innerText = "MATRICULE : " + data.matricule;
+            document.getElementById('c-sexe').innerText = data.sexe;
+            document.getElementById('c-birth').innerText = data.birth_date;
+            document.getElementById('c-class').innerText = data.class_label;
+            document.getElementById('casier-view').style.display = 'block';
+        }
+
+        function closeCasier() { document.getElementById('casier-view').style.display = 'none'; }
+        function upLogo(e) {
             const reader = new FileReader();
-            reader.onload = function() {
-                const preview = document.getElementById('logo-preview');
-                preview.src = reader.result;
-                preview.style.display = 'block';
-                document.getElementById('logo-text').style.display = 'none';
+            reader.onload = () => { 
+                document.getElementById('img-logo').src = reader.result;
+                document.getElementById('img-logo').style.display = 'block';
+                document.getElementById('txt-logo').style.display = 'none';
             }
             reader.readAsDataURL(e.target.files[0]);
         }
-
-        // ECOLE & OPTIONS
-        function showOptions() {
-            document.getElementById('config-step-1').style.display = 'none';
-            const selector = document.getElementById('options-selector');
-            selector.innerHTML = allOptions.map(o => `<label style="padding:15px; border:1px solid var(--border); border-radius:12px; cursor:pointer;"><input type="checkbox" value="${o}"> ${o}</label>`).join('');
-            document.getElementById('config-step-2').style.display = 'block';
-        }
-
-        async function saveAndBuildClasses() {
-            const checks = document.querySelectorAll('#options-selector input:checked');
-            selectedOptions = Array.from(checks).map(c => c.value);
-            if(selectedOptions.length === 0) return alert("Sélectionnez au moins une option");
-
-            let structure = [
-                { label: "7ème Éducation de Base", opt: "Base" },
-                { label: "8ème Éducation de Base", opt: "Base" }
-            ];
-            selectedOptions.forEach(o => {
-                ["1ère", "2ème", "3ème", "4ème"].forEach(n => structure.push({ label: `${n} ${o}`, opt: o }));
-            });
-
-            await _supabase.from('school_config').insert([{ section: 'Secondaire', options: selectedOptions, classes: structure }]);
-            renderFinalStructure(structure);
-        }
-
-        function renderFinalStructure(classes) {
-            document.getElementById('config-step-2').style.display = 'none';
-            document.getElementById('config-step-3').style.display = 'block';
-            const display = document.getElementById('final-structure-display');
-            display.innerHTML = "";
-
-            // Cycle de Base
-            let baseHtml = `<div class="opt-folder"><div class="opt-header">CYCLE DE BASE</div><div class="opt-content" style="display:grid;">`;
-            classes.filter(c => c.opt === 'Base').forEach(c => baseHtml += `<div class="class-badge" onclick="manageClass('${c.label}')">${c.label}</div>`);
-            display.innerHTML += baseHtml + `</div></div>`;
-
-            // Humanités
-            selectedOptions.forEach(opt => {
-                let optHtml = `<div class="opt-folder"><div class="opt-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'grid' ? 'none' : 'grid'">${opt.toUpperCase()} <i class="fa-solid fa-chevron-down"></i></div><div class="opt-content">`;
-                classes.filter(c => c.opt === opt).forEach(c => optHtml += `<div class="class-badge" onclick="manageClass('${c.label}')">${c.label}</div>`);
-                display.innerHTML += optHtml + `</div></div>`;
-            });
-        }
-
-        // GESTION ELEVES
-        function manageClass(name) {
-            activeClassName = name;
-            document.getElementById('active-class-name').innerText = name;
-            showModule('class-manager');
-            fetchStudents();
-        }
-
-        async function processBulkStudents() {
-            const input = document.getElementById('bulk-input').value;
-            const lines = input.split('\n').filter(l => l.trim() !== "");
-            const students = lines.map(line => {
-                const p = line.split(',');
-                return { fullname: p[0].trim(), birth_date: p[1] ? p[1].trim() : 'N/A', class_label: activeClassName };
-            });
-
-            const { error } = await _supabase.from('students').insert(students);
-            if(!error) {
-                document.getElementById('bulk-input').value = "";
-                fetchStudents();
-                alert("Liste enregistrée !");
-            }
-        }
-
-        async function fetchStudents() {
-            const { data } = await _supabase.from('students').select('*').eq('class_label', activeClassName);
-            document.getElementById('student-count').innerText = data.length;
-            document.getElementById('student-list').innerHTML = data.map(s => `<div style="padding:10px; border-bottom:1px solid var(--gray); font-size:13px;"><b>${s.fullname}</b> <span style="float:right; color:#888;">${s.birth_date}</span></div>`).join('');
-        }
     </script>
 </body>
-    </html>
-    
+                        </html>
+                        
