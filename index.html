@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarite Platinum | Portail Unifié</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root {
+            --gold: #D4AF37;
+            --black: #000000;
+            --white: #FFFFFF;
+            --gray: #F8F9FA;
+            --text-dark: #1A1A1A;
+            --border: #E0E0E0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--white); color: var(--text-dark); overflow-x: hidden; }
+
+        /* --- HEADER --- */
+        header { padding: 20px 5%; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-circle { 
+            width: 40px; height: 40px; background: var(--black); color: var(--gold); 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 20px; border: 1px solid var(--gold);
+        }
+        .logo-text { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--black); }
+
+        /* --- HERO SECTION --- */
+        .hero { padding: 80px 5%; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero h1 { font-size: 42px; font-weight: 800; margin-bottom: 20px; color: var(--black); }
+        .hero p { font-size: 18px; color: #666; line-height: 1.6; }
+
+        /* --- RUBRIQUES GRID --- */
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 25px; padding: 40px 5%; max-width: 1200px; margin: 0 auto; 
+        }
+        .role-card { 
+            background: var(--white); border: 1px solid var(--border); padding: 40px 20px; 
+            border-radius: 24px; text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .role-card:hover { 
+            border-color: var(--gold); transform: translateY(-10px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); 
+        }
+        .role-card i { font-size: 40px; color: var(--black); margin-bottom: 20px; transition: 0.3s; }
+        .role-card:hover i { color: var(--gold); }
+        .role-card h3 { font-size: 16px; font-weight: 700; color: var(--black); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- MODAL --- */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; 
+        }
+        .modal-box { 
+            background: var(--white); padding: 40px; border-radius: 30px; width: 400px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1); border: 1px solid var(--gold);
+        }
+        .modal-box h2 { margin-bottom: 10px; font-size: 24px; }
+        .modal-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
+        
+        input { 
+            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; 
+            border: 1px solid var(--border); background: var(--gray); font-size: 14px;
+        }
+        .btn-action { 
+            width: 100%; padding: 15px; border-radius: 12px; border: none; 
+            background: var(--black); color: var(--gold); font-weight: 700; cursor: pointer;
+        }
+        .btn-action:hover { background: #222; }
+
+        #status-msg { margin-top: 15px; font-size: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-circle">S</div>
+            <div class="logo-text">SCHOLARITE <span style="color: var(--gold);">PLATINUM</span></div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>L'excellence au cœur de votre établissement scolaire.</h1>
+        <p>Une architecture numérique robuste pour piloter la finance, la pédagogie et la discipline en temps réel. Choisissez votre profil pour commencer.</p>
+    </section>
+
+    <div class="grid-container">
+        <div class="role-card" onclick="openProfile('Promoteur')">
+            <i class="fa-solid fa-crown"></i>
+            <h3>Promoteur</h3>
+        </div>
+        <div class="role-card" onclick="openProfile('Directeur des Études')">
+            <i class="fa-solid fa-user-tie"></i>
+            <h3>Directeur</h3>
+        </div>
+        <div class="role-card" onclick="openProfile('Comptable')">
+            <i class="fa-solid fa-wallet"></i>
+            <h3>Comptable</h3>
+        </div>
+        <div class="role-card" onclick="openProfile('Professeur')">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <h3>Professeur</h3>
+        </div>
+        <div class="role-card" onclick="openProfile('Parent / Élève')">
+            <i class="fa-solid fa-users"></i>
+            <h3>Parents / Élèves</h3>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box">
+            <h2 id="modal-role-title">Créer Profil</h2>
+            <p>Initialisation de votre accès sécurisé.</p>
+            
+            <input type="text" id="user-fullname" placeholder="Nom complet">
+            <input type="password" id="user-pass" placeholder="Mot de passe">
+            
+            <button class="btn-action" onclick="saveProfile()">CRÉER MON PROFIL</button>
+            <p id="status-msg"></p>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#999; cursor:pointer; font-size:12px;">Annuler</button>
+        </div>
+    </div>
+
+    <script>
+        // --- NOUVELLES CLÉS SUPABASE ---
+        const SB_URL = "https://chpydetdbfugwwhsvgin.supabase.co"; 
+        const SB_KEY = "sb_publishable_G3rNGdnIihPNVfaLj1C4VQ_1TUBFh_z"; 
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        let selectedRole = "";
+
+        function openProfile(role) {
+            selectedRole = role;
+            document.getElementById('modal-role-title').innerText = "Profil " + role;
+            document.getElementById('profile-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('profile-modal').style.display = 'none';
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('user-fullname').value;
+            const pass = document.getElementById('user-pass').value;
+            const msg = document.getElementById('status-msg');
+
+            if(!name || !pass) {
+                msg.style.color = "red";
+                msg.innerText = "Veuillez remplir tous les champs.";
+                return;
+            }
+
+            msg.style.color = "var(--black)";
+            msg.innerText = "Enregistrement en cours...";
+
+            // Sauvegarde dans une table 'utilisateurs'
+            const { error } = await _supabase.from('profiles').insert([
+                { 
+                    full_name: name, 
+                    password: pass, // Note: Dans un vrai système, on hacherait le mot de passe
+                    role: selectedRole,
+                    created_at: new Date()
+                }
+            ]);
+
+            if(!error) {
+                msg.style.color = "green";
+                msg.innerText = "Profil créé avec succès ! Bienvenue.";
+                setTimeout(() => {
+                    closeModal();
+                    // Ici on pourra rediriger vers le module spécifique plus tard
+                    alert("Redirection vers l'espace " + selectedRole + " bientôt disponible.");
+                }, 1500);
+            } else {
+                msg.style.color = "red";
+                msg.innerText = "Erreur : " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
