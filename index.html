@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite Platinum | Direction V2</title>
+    <title>Scholarite Platinum | Direction V2.1</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -17,26 +17,24 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--white); color: var(--black); transition: 0.5s; }
+        body { background: var(--white); color: var(--black); transition: 0.5s; overflow-x: hidden; }
 
-        /* --- PORTAIL D'ACCUEIL --- */
+        /* --- PORTAIL & LOGIN --- */
         #portal-view { padding: 50px 5%; text-align: center; }
         .logo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 60px; justify-content: center; }
         .logo-sq { width: 45px; height: 45px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 800; border: 1px solid var(--gold); }
         
         .grid-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 40px auto; }
-        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; background: #fff; }
+        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; background: #fff; text-align: center; }
         .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
         .card i { font-size: 35px; margin-bottom: 15px; display: block; color: var(--black); }
 
-        /* --- INTERFACE DIRECTEUR --- */
-        #director-view { display: none; height: 100vh; flex-direction: column; }
-        .dir-header { padding: 20px 5%; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        /* --- DASHBOARD DIRECTEUR --- */
+        #director-view { display: none; min-height: 100vh; flex-direction: column; }
+        .dir-header { padding: 20px 5%; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #fff; position: sticky; top: 0; z-index: 100; }
         
-        .dir-container { padding: 60px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .dir-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
-        
-        @media (min-width: 768px) { .dir-grid { grid-template-columns: repeat(4, 1fr); } }
+        .dir-container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .dir-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
 
         .dir-item { 
             background: var(--white); border: 1px solid var(--border); padding: 40px 20px; 
@@ -46,11 +44,19 @@
         .dir-item i { font-size: 40px; color: var(--black); margin-bottom: 20px; }
         .dir-item h3 { text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; font-weight: 800; }
 
-        /* --- MODAL --- */
+        /* --- MODULE ÉCOLE --- */
+        #school-view { display: none; padding-bottom: 100px; }
+        .option-box { padding: 15px; border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; gap: 10px; transition: 0.2s; cursor: pointer; }
+        .option-box:hover { border-color: var(--gold); background: #fffcf0; }
+        .option-box input { width: auto; margin: 0; }
+
+        /* --- MODALS & INPUTS --- */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-box { background: #fff; padding: 40px; border-radius: 30px; width: 400px; border: 1px solid var(--gold); }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; }
         .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 14px; }
+        
+        .btn-back { background: none; border: none; cursor: pointer; color: var(--black); font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -89,19 +95,19 @@
             </div>
 
             <div class="dir-grid">
-                <div class="dir-item">
+                <div class="dir-item" onclick="openModule('school')">
                     <i class="fa-solid fa-school"></i>
                     <h3>École</h3>
                 </div>
-                <div class="dir-item">
+                <div class="dir-item" onclick="alert('Module Professeurs en attente')">
                     <i class="fa-solid fa-users-gear"></i>
                     <h3>Professeurs</h3>
                 </div>
-                <div class="dir-item">
+                <div class="dir-item" onclick="alert('Module Archives en attente')">
                     <i class="fa-solid fa-box-archive"></i>
                     <h3>Archives</h3>
                 </div>
-                <div class="dir-item">
+                <div class="dir-item" onclick="alert('Module Programme en attente')">
                     <i class="fa-solid fa-book-open"></i>
                     <h3>Programme</h3>
                 </div>
@@ -113,49 +119,137 @@
         </div>
     </div>
 
+    <div id="school-view" class="dir-container">
+        <button class="btn-back" onclick="openModule('dashboard')">
+            <i class="fa-solid fa-arrow-left"></i> RETOUR AU TABLEAU DE BORD
+        </button>
+        
+        <div id="school-setup-content">
+            <h1 style="font-size: 26px; margin-bottom: 10px;">Configuration École</h1>
+            <p style="color:#888; margin-bottom:40px;">Définition des cycles et des options d'études.</p>
+
+            <div id="step-section">
+                <h3 style="margin-bottom:20px;">1. Sélectionnez la section :</h3>
+                <div class="dir-grid">
+                    <div class="dir-item" onclick="selectSection('Maternelle')"><i class="fa-solid fa-baby"></i><h3>Maternelle</h3></div>
+                    <div class="dir-item" onclick="selectSection('Primaire')"><i class="fa-solid fa-child"></i><h3>Primaire</h3></div>
+                    <div class="dir-item" onclick="selectSection('Secondaire')" style="border-color:var(--gold);">
+                        <i class="fa-solid fa-user-graduate"></i><h3>Secondaire</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-options" style="display:none; margin-top:40px;">
+                <h3 style="margin-bottom:20px;">2. Cochez les options disponibles :</h3>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px;" id="options-list"></div>
+                <button class="btn-black" style="margin-top:40px; width:auto; padding:18px 50px;" onclick="saveAndGenerateClasses()">ENREGISTRER & GÉNÉRER LES CLASSES</button>
+            </div>
+
+            <div id="step-final" style="display:none; margin-top:40px;">
+                <h3 style="margin-bottom:20px; color:var(--gold);">Architecture des Classes validée</h3>
+                <div id="final-classes-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;"></div>
+                <button class="btn-black" style="margin-top:40px; width:auto;" onclick="openModule('dashboard')">TERMINER LA CONFIGURATION</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="reg-modal">
         <div class="modal-box">
-            <h2 id="role-title" style="font-size: 20px;">Créer un compte</h2>
-            <p style="font-size:12px; color:#777; margin-bottom:20px;">Modérateur du système Platinum.</p>
-            
+            <h2 id="role-title">Créer un compte</h2>
+            <p style="font-size:12px; color:#777; margin-bottom:20px;">Accès sécurisé Modérateur.</p>
             <input type="text" id="reg-name" placeholder="Nom complet">
             <input type="password" id="reg-pass" placeholder="Mot de passe secret">
-            
             <button class="btn-black" onclick="handleDirectorSignup()">CONFIGURER L'ACCÈS</button>
             <button onclick="document.getElementById('reg-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:15px; color:#aaa; cursor:pointer; font-size:12px;">Annuler</button>
         </div>
     </div>
 
     <script>
-        // --- NOUVELLES CLÉS V2 ---
+        // --- CONFIGURATION SUPABASE V2 ---
         const SB_URL = "https://dztbxntfsouuyrrigaah.supabase.co"; 
         const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        let configEcole = { section: '', options: [] };
+        const optionsList = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction Bâtiment", "Commercial", "Électricité", "Électronique", "Mécanique", "Coupe-Couture", "Nutrition"];
+
+        // --- NAVIGATION ---
+        function openModule(mod) {
+            document.getElementById('portal-view').style.display = 'none';
+            document.getElementById('director-view').style.display = mod === 'dashboard' ? 'flex' : 'none';
+            document.getElementById('school-view').style.display = mod === 'school' ? 'block' : 'none';
+        }
 
         function openReg(role) {
             document.getElementById('role-title').innerText = "Accès " + role;
             document.getElementById('reg-modal').style.display = 'flex';
         }
 
+        // --- LOGIQUE DIRECTEUR ---
         async function handleDirectorSignup() {
             const name = document.getElementById('reg-name').value;
             const pass = document.getElementById('reg-pass').value;
-
             if(!name || !pass) return alert("Champs obligatoires");
 
-            const { error } = await _supabase.from('profiles').insert([
-                { full_name: name, password: pass, role: 'Directeur' }
+            const { error } = await _supabase.from('profiles').insert([{ full_name: name, password: pass, role: 'Directeur' }]);
+            if(!error) {
+                document.getElementById('reg-modal').style.display = 'none';
+                document.getElementById('dir-name-label').innerText = name;
+                openModule('dashboard');
+            } else { alert("Erreur : " + error.message); }
+        }
+
+        // --- LOGIQUE ÉCOLE ---
+        function selectSection(sec) {
+            configEcole.section = sec;
+            if(sec === 'Secondaire') {
+                const listDiv = document.getElementById('options-list');
+                listDiv.innerHTML = optionsList.map(opt => `
+                    <label class="option-box">
+                        <input type="checkbox" value="${opt}"> <span>${opt}</span>
+                    </label>
+                `).join('');
+                document.getElementById('step-options').style.display = 'block';
+                document.getElementById('step-section').style.opacity = '0.3';
+            } else { alert("Bientôt disponible."); }
+        }
+
+        async function saveAndGenerateClasses() {
+            const checks = document.querySelectorAll('#options-list input:checked');
+            configEcole.options = Array.from(checks).map(c => c.value);
+            if(configEcole.options.length === 0) return alert("Sélectionnez au moins une option");
+
+            // Génération de la structure (7e, 8e + Humanités)
+            let structure = [
+                { label: "7ème Éducation de Base", option: "Tronc Commun" },
+                { label: "8ème Éducation de Base", option: "Tronc Commun" }
+            ];
+
+            configEcole.options.forEach(opt => {
+                for(let i=1; i<=4; i++) {
+                    structure.push({ label: i + (i==1?'ère':'ème') + " " + opt, option: opt });
+                }
+            });
+
+            // Sauvegarde Supabase
+            const { error } = await _supabase.from('school_config').insert([
+                { section: 'Secondaire', options: configEcole.options, classes: structure }
             ]);
 
             if(!error) {
-                document.getElementById('reg-modal').style.display = 'none';
-                document.getElementById('portal-view').style.display = 'none';
-                document.getElementById('director-view').style.display = 'flex';
-                document.getElementById('dir-name-label').innerText = name;
-            } else {
-                alert("Erreur de connexion : " + error.message);
-            }
+                document.getElementById('step-options').style.display = 'none';
+                document.getElementById('step-section').style.display = 'none';
+                document.getElementById('step-final').style.display = 'block';
+                
+                const grid = document.getElementById('final-classes-grid');
+                grid.innerHTML = structure.map(c => `
+                    <div style="padding:12px; border:1px solid var(--gold); border-radius:10px; font-size:11px; font-weight:700; background:#fffcf0;">
+                        ${c.label}
+                    </div>
+                `).join('');
+            } else { alert("Erreur : " + error.message); }
         }
     </script>
 </body>
-</html>
+                    </html>
+                    
