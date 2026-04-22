@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite Platinum | Direction</title>
+    <title>Scholarite Platinum | Direction V2</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -25,30 +25,32 @@
         .logo-sq { width: 45px; height: 45px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 800; border: 1px solid var(--gold); }
         
         .grid-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 40px auto; }
-        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; }
+        .card { padding: 40px; border: 1px solid var(--border); border-radius: 25px; cursor: pointer; transition: 0.3s; background: #fff; }
         .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
-        .card i { font-size: 35px; margin-bottom: 15px; display: block; }
+        .card i { font-size: 35px; margin-bottom: 15px; display: block; color: var(--black); }
 
-        /* --- INTERFACE DIRECTEUR (MASQUÉE PAR DÉFAUT) --- */
+        /* --- INTERFACE DIRECTEUR --- */
         #director-view { display: none; height: 100vh; flex-direction: column; }
         .dir-header { padding: 20px 5%; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
         .dir-container { padding: 60px 5%; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .dir-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .dir-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
         
+        @media (min-width: 768px) { .dir-grid { grid-template-columns: repeat(4, 1fr); } }
+
         .dir-item { 
-            background: var(--white); border: 1px solid var(--border); padding: 50px 30px; 
-            border-radius: 30px; text-align: center; cursor: pointer; transition: 0.4s;
+            background: var(--white); border: 1px solid var(--border); padding: 40px 20px; 
+            border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s;
         }
-        .dir-item:hover { background: var(--black); color: var(--white); border-color: var(--black); }
-        .dir-item i { font-size: 45px; color: var(--gold); margin-bottom: 25px; }
-        .dir-item h3 { text-transform: uppercase; letter-spacing: 2px; font-size: 14px; }
+        .dir-item:hover { border-color: var(--gold); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .dir-item i { font-size: 40px; color: var(--black); margin-bottom: 20px; }
+        .dir-item h3 { text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; font-weight: 800; }
 
         /* --- MODAL --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-box { background: #fff; padding: 40px; border-radius: 30px; width: 400px; border: 1px solid var(--gold); }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); }
-        .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: var(--gray); font-size: 14px; }
+        .btn-black { width: 100%; padding: 16px; background: #000; color: var(--gold); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -58,15 +60,14 @@
             <div class="logo-sq">S</div>
             <h2 style="letter-spacing: -1px;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h2>
         </div>
-        <h1 style="font-size: 36px; margin-bottom: 15px;">Bienvenue dans le centre de contrôle.</h1>
-        <p style="color: #777; margin-bottom: 40px;">Sélectionnez votre profil pour accéder aux outils de gestion.</p>
+        <h1 style="font-size: 32px; margin-bottom: 10px;">Portail d'Administration</h1>
+        <p style="color: #777; margin-bottom: 40px;">Initialisez votre session pour configurer l'établissement.</p>
 
         <div class="grid-roles">
             <div class="card" onclick="openReg('Directeur des Études')"><i class="fa-solid fa-user-tie"></i><h3>Directeur</h3></div>
-            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-crown"></i><h3>Promoteur</h3></div>
-            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-wallet"></i><h3>Comptable</h3></div>
-            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-chalkboard-user"></i><h3>Professeur</h3></div>
-            <div class="card" onclick="alert('Accès restreint')"><i class="fa-solid fa-users"></i><h3>Parents</h3></div>
+            <div class="card" onclick="alert('Module Promoteur en attente')"><i class="fa-solid fa-crown"></i><h3>Promoteur</h3></div>
+            <div class="card" onclick="alert('Module Comptabilité en attente')"><i class="fa-solid fa-wallet"></i><h3>Comptable</h3></div>
+            <div class="card" onclick="alert('Module Professeur en attente')"><i class="fa-solid fa-chalkboard-user"></i><h3>Professeur</h3></div>
         </div>
     </div>
 
@@ -76,60 +77,59 @@
                 <div class="logo-sq" style="width:35px; height:35px; font-size:16px;">S</div>
                 <span style="font-weight:800; font-size:14px;">PLATINUM <span style="color:var(--gold)">DIRECTOR</span></span>
             </div>
-            <div id="user-display" style="font-size:12px; font-weight:600; border:1px solid var(--border); padding:8px 15px; border-radius:20px;">
-                Directeur: <span id="dir-name-label">En attente...</span>
+            <div style="font-size:11px; font-weight:700; background: var(--gray); padding:8px 15px; border-radius:20px; border:1px solid var(--border);">
+                SESSION : <span id="dir-name-label" style="color:var(--gold); text-transform: uppercase;">ADMIN</span>
             </div>
         </header>
 
         <div class="dir-container">
-            <div style="margin-bottom: 50px;">
-                <h1 style="font-size: 28px;">Configuration Système</h1>
-                <p style="color:#888;">Modérez et organisez les paramètres de votre établissement.</p>
+            <div style="margin-bottom: 40px;">
+                <h1 style="font-size: 26px; font-weight: 800;">Tableau de Bord Directeur</h1>
+                <p style="color:#888; font-size: 14px;">Modérez les structures et les accès de l'école.</p>
             </div>
 
             <div class="dir-grid">
-                <div class="dir-item" onclick="alert('Configuration École')">
+                <div class="dir-item">
                     <i class="fa-solid fa-school"></i>
                     <h3>École</h3>
                 </div>
-                <div class="dir-item" onclick="alert('Gestion Professeurs')">
+                <div class="dir-item">
                     <i class="fa-solid fa-users-gear"></i>
                     <h3>Professeurs</h3>
                 </div>
-                <div class="dir-item" onclick="alert('Accès Archives')">
+                <div class="dir-item">
                     <i class="fa-solid fa-box-archive"></i>
                     <h3>Archives</h3>
                 </div>
-                <div class="dir-item" onclick="alert('Édition Programme')">
+                <div class="dir-item">
                     <i class="fa-solid fa-book-open"></i>
                     <h3>Programme</h3>
                 </div>
-                <div class="dir-item" onclick="alert('Paramètres')">
-                    <i class="fa-solid fa-sliders"></i>
-                    <h3>Paramètres</h3>
-                </div>
-                <div class="dir-item" onclick="location.reload()">
-                    <i class="fa-solid fa-power-off"></i>
-                    <h3>Quitter</h3>
-                </div>
             </div>
+            
+            <button onclick="location.reload()" style="margin-top: 50px; background: none; border: 1px solid var(--border); padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: 700; color: #999; font-size: 11px;">
+                <i class="fa-solid fa-power-off"></i> DÉCONNEXION
+            </button>
         </div>
     </div>
 
     <div class="modal" id="reg-modal">
         <div class="modal-box">
-            <h2 id="role-title">Créer un compte</h2>
-            <p style="font-size:13px; color:#777; margin-bottom:20px;">Identifiants de modération requis.</p>
+            <h2 id="role-title" style="font-size: 20px;">Créer un compte</h2>
+            <p style="font-size:12px; color:#777; margin-bottom:20px;">Modérateur du système Platinum.</p>
+            
             <input type="text" id="reg-name" placeholder="Nom complet">
-            <input type="password" id="reg-pass" placeholder="Mot de passe">
-            <button class="btn-black" onclick="handleDirectorSignup()">CRÉER L'ACCÈS</button>
-            <button onclick="document.getElementById('reg-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:15px; color:#aaa; cursor:pointer;">Annuler</button>
+            <input type="password" id="reg-pass" placeholder="Mot de passe secret">
+            
+            <button class="btn-black" onclick="handleDirectorSignup()">CONFIGURER L'ACCÈS</button>
+            <button onclick="document.getElementById('reg-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:15px; color:#aaa; cursor:pointer; font-size:12px;">Annuler</button>
         </div>
     </div>
 
     <script>
-        const SB_URL = "https://chpydetdbfugwwhsvgin.supabase.co"; 
-        const SB_KEY = "sb_publishable_G3rNGdnIihPNVfaLj1C4VQ_1TUBFh_z"; 
+        // --- NOUVELLES CLÉS V2 ---
+        const SB_URL = "https://dztbxntfsouuyrrigaah.supabase.co"; 
+        const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
         function openReg(role) {
@@ -141,19 +141,19 @@
             const name = document.getElementById('reg-name').value;
             const pass = document.getElementById('reg-pass').value;
 
-            if(!name || !pass) return alert("Champs requis");
+            if(!name || !pass) return alert("Champs obligatoires");
 
-            const { error } = await _supabase.from('profiles').insert([{ full_name: name, password: pass, role: 'Directeur' }]);
+            const { error } = await _supabase.from('profiles').insert([
+                { full_name: name, password: pass, role: 'Directeur' }
+            ]);
 
             if(!error) {
-                // Succès : On cache le portail et on montre l'interface Directeur
                 document.getElementById('reg-modal').style.display = 'none';
                 document.getElementById('portal-view').style.display = 'none';
                 document.getElementById('director-view').style.display = 'flex';
                 document.getElementById('dir-name-label').innerText = name;
-                document.body.style.backgroundColor = "#fff"; 
             } else {
-                alert("Erreur: " + error.message);
+                alert("Erreur de connexion : " + error.message);
             }
         }
     </script>
