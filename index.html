@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarite Platinum | Système Intégré</title>
+    <title>Scholarite Platinum | Gestion Intégrée</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,138 +13,147 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--white); color: var(--black); overflow-x: hidden; display: flex; }
 
-        /* SIDEBAR GAUCHE */
+        /* UI GENERALE */
         #sidebar { width: var(--sidebar-w); height: 100vh; background: var(--black); color: white; position: fixed; left: -260px; transition: 0.4s ease; z-index: 1500; padding: 30px 20px; border-right: 1px solid var(--gold); }
         #sidebar.open { left: 0; }
         .nav-item { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; color: #aaa; font-weight: 600; }
         .nav-item:hover, .nav-item.active { background: #1a1a1a; color: var(--gold); }
-        .nav-item i { width: 20px; }
-
-        /* MAIN CONTENT AREA */
         main { flex: 1; margin-left: 0; transition: 0.4s ease; min-height: 100vh; width: 100%; }
         main.shifted { margin-left: var(--sidebar-w); }
 
-        /* HEADER */
         header { padding: 15px 5%; display: none; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: #fff; position: sticky; top: 0; z-index: 1000; }
         .logo-sq { width: 35px; height: 35px; background: #000; color: var(--gold); display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--gold); font-weight: 800; }
 
-        /* CONFIG DRAWER (TIROIR DROITE) */
-        #config-drawer { position: fixed; right: -450px; top: 0; width: 450px; height: 100vh; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 2000; transition: 0.4s; padding: 40px 30px; overflow-y: auto; border-left: 2px solid var(--gold); }
-        #config-drawer.open { right: 0; }
-        .drawer-section { margin-bottom: 25px; border-bottom: 1px solid var(--gray); padding-bottom: 15px; }
-        .drawer-section h4 { color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
-
-        /* UI ELEMENTS */
+        /* TABLES & FORMULAIRES */
         .view { display: none; padding: 40px 5%; max-width: 1200px; margin: 0 auto; }
         .active { display: block; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .card { padding: 30px; border: 1px solid var(--border); border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; background: #fff; }
-        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        input, select, textarea { width: 100%; padding: 12px; margin: 5px 0 15px; border-radius: 10px; border: 1px solid var(--border); background: var(--gray); font-size: 13px; font-weight: 600; }
-        .btn-gold { background: var(--black); color: var(--gold); border: none; padding: 15px 30px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { padding: 25px; border: 1px solid var(--border); border-radius: 20px; background: #fff; transition: 0.3s; position: relative;}
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--gray); font-size: 13px; }
+        .btn-gold { background: var(--black); color: var(--gold); border: none; padding: 12px 20px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        
+        /* CASIER MODAL */
+        #casier-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; overflow-y:auto; padding: 20px; }
+        .casier-content { background:white; max-width:900px; margin:auto; border-radius:20px; padding:40px; position:relative; border-top: 10px solid var(--gold); }
+        .tab-set { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { padding: 8px 15px; cursor: pointer; font-size: 12px; font-weight: 800; border-radius: 5px; }
+        .tab-btn.active { background: var(--gold); color: white; }
+
+        #config-drawer { position: fixed; right: -450px; top: 0; width: 450px; height: 100vh; background: white; box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 2000; transition: 0.4s; padding: 40px 30px; overflow-y: auto; border-left: 2px solid var(--gold); }
+        #config-drawer.open { right: 0; }
     </style>
 </head>
 <body>
 
     <nav id="sidebar">
-        <div style="margin-bottom: 50px; display: flex; align-items: center; gap: 10px;">
-            <div class="logo-sq">S</div>
-            <span style="font-weight: 800; font-size: 12px; color: var(--gold);">SCHOLARITE</span>
-        </div>
-        <div class="nav-item active" onclick="showModule('director')"><i class="fa-solid fa-gauge"></i> Tableau de bord</div>
-        <div class="nav-item" onclick="showModule('school-config')"><i class="fa-solid fa-school"></i> École</div>
-        <div class="nav-item" onclick="alert('Professeurs')"><i class="fa-solid fa-users-gear"></i> Professeurs</div>
-        <div class="nav-item" onclick="alert('Archives')"><i class="fa-solid fa-box-archive"></i> Archives</div>
-        <div class="nav-item" onclick="alert('Programme')"><i class="fa-solid fa-book-open"></i> Programme</div>
+        <div style="margin-bottom: 40px;"><div class="logo-sq">S</div></div>
+        <div class="nav-item active" onclick="showModule('director')"><i class="fa-solid fa-gauge"></i> Dashboard</div>
+        <div class="nav-item" onclick="showModule('school-config')"><i class="fa-solid fa-school"></i> Architecture</div>
+        <div class="nav-item" onclick="showModule('students-list')"><i class="fa-solid fa-user-graduate"></i> Élèves & Casier</div>
         <div class="nav-item" style="margin-top: 50px; color: #ff4d4d;" onclick="location.reload()"><i class="fa-solid fa-power-off"></i> Déconnexion</div>
     </nav>
 
     <main id="main-content">
         <header id="top-nav">
             <div style="display:flex; align-items:center; gap:15px;">
-                <button onclick="toggleSidebar()" style="background:none; border:none; cursor:pointer; font-size:20px;"><i class="fa-solid fa-bars-staggered"></i></button>
-                <span id="display-school-name" style="font-weight:800; font-size:14px; color:var(--black); letter-spacing: 1px;">SÉLECTIONNEZ UNE ÉCOLE</span>
+                <button onclick="toggleSidebar()" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-bars-staggered"></i></button>
+                <span id="display-school-name" style="font-weight:800; font-size:14px;">SCHOLARITE PLATINUM</span>
             </div>
-            
-            <div style="text-align: right;">
-                <div id="school-logo-btn" onclick="toggleDrawer()" style="cursor:pointer; display:flex; align-items:center; gap:12px; background: var(--gray); padding: 5px 15px; border-radius: 15px;">
-                    <div style="text-align: right;">
-                        <div id="user-tag" style="font-weight:800; font-size:11px; text-transform:uppercase;">Directeur</div>
-                        <div style="font-size: 8px; color: var(--gold); font-weight: 800;">MA CONFIGURATION</div>
-                    </div>
-                    <div class="logo-sq" style="width:35px; height:35px; font-size:16px;"><i class="fa-solid fa-building-columns"></i></div>
-                </div>
+            <div onclick="toggleDrawer()" style="cursor:pointer; display:flex; align-items:center; gap:10px; background:var(--gray); padding:5px 15px; border-radius:15px;">
+                <span style="font-weight:800; font-size:11px;">CONFIG</span>
+                <div class="logo-sq" style="width:30px; height:30px;"><i class="fa-solid fa-cog"></i></div>
             </div>
         </header>
 
-        <div id="view-portal" class="view active" style="text-align: center; padding-top: 100px;">
-            <h1 style="font-size: 40px; font-weight: 800;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h1>
-            <p style="color: #888; margin-bottom: 50px; font-weight: 600;">Bienvenue dans votre espace de gestion</p>
-            <div class="grid" style="max-width: 900px; margin: 0 auto;">
-                <div class="card" onclick="showLogin('Directeur')"><i class="fa-solid fa-user-tie" style="font-size:35px; margin-bottom:15px; color: var(--gold);"></i><h3>Directeur</h3></div>
-                <div class="card" style="opacity:0.5;"><i class="fa-solid fa-crown" style="font-size:35px; margin-bottom:15px;"></i><h3>Promoteur</h3></div>
-                <div class="card" style="opacity:0.5;"><i class="fa-solid fa-wallet" style="font-size:35px; margin-bottom:15px;"></i><h3>Comptable</h3></div>
-            </div>
-        </div>
-
-        <div id="view-director" class="view">
-            <h2 id="welcome-text">Bienvenue, M. le Directeur</h2>
-            <div class="grid" style="margin-top:30px;">
-                <div class="card"><h1 style="color:var(--gold);">0</h1><p style="font-weight: 800; font-size: 11px;">ÉLÈVES INSCRITS</p></div>
-                <div class="card"><h1 style="color:var(--gold);">0</h1><p style="font-weight: 800; font-size: 11px;">ENSEIGNANTS</p></div>
-                <div class="card"><h1 style="color:var(--gold);">0%</h1><p style="font-weight: 800; font-size: 11px;">PERFORMANCE</p></div>
+        <div id="view-portal" class="view active" style="text-align:center; padding-top:100px;">
+            <h1 style="font-size:40px; font-weight:800;">SCHOLARITE <span style="color:var(--gold)">PLATINUM</span></h1>
+            <div class="grid" style="max-width:800px; margin:50px auto;">
+                <div class="card" onclick="showLogin('Directeur')"><i class="fa-solid fa-user-tie" style="font-size:40px; color:var(--gold)"></i><h3>Directeur</h3></div>
+                <div class="card" style="opacity:0.5"><h3>Comptable</h3></div>
             </div>
         </div>
 
         <div id="view-school-config" class="view">
-            <h2 style="margin-bottom:30px;">Architecture des Classes</h2>
-            <div id="setup-section">
-                <div id="opt-grid" class="grid" style="margin-top:20px;"></div>
-                <button class="btn-gold" style="width: auto; margin-top:30px;" onclick="generateArchitecture()">GÉNÉRER L'ARCHITECTURE</button>
+            <h2>Architecture de l'École</h2>
+            <div id="setup-section" class="card" style="margin-top:20px;">
+                <h4>Sélectionnez les sections organisées</h4>
+                <div id="opt-grid" class="grid" style="margin:20px 0;"></div>
+                <div style="margin-top:20px; padding:20px; border-top:1px solid var(--border);">
+                    <label>Nombre de classes par niveau (ex: A, B) :</label>
+                    <input type="number" id="class-count" value="1" min="1" max="5" style="width:100px;">
+                </div>
+                <button class="btn-gold" onclick="generateAndSaveClasses()">GÉNÉRER & ENREGISTRER L'ARCHITECTURE</button>
             </div>
-            <div id="class-results" style="margin-top:40px;"></div>
+            <div id="class-display" class="grid" style="margin-top:30px;"></div>
+        </div>
+
+        <div id="view-students-list" class="view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Registre des Élèves</h2>
+                <select id="filter-classe" onchange="loadStudents()" style="width:200px;"></select>
+            </div>
+            
+            <div class="card" style="overflow-x:auto;">
+                <table id="student-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="text-align:left; border-bottom:2px solid var(--gold);">
+                            <th style="padding:10px;">Nom</th>
+                            <th>Post-nom</th>
+                            <th>Prénom</th>
+                            <th>Sexe</th>
+                            <th>Naissance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-body">
+                        </tbody>
+                </table>
+                <button class="btn-gold" id="btn-add-line" style="margin-top:15px; display:none;" onclick="addStudentRow()"><i class="fa-solid fa-plus"></i> Ajouter un élève</button>
+                <button class="btn-gold" onclick="saveAllStudents()" style="background:var(--gold); color:white; margin-left:10px;">ENREGISTRER LA LISTE</button>
+            </div>
         </div>
     </main>
 
-    <div id="config-drawer">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 style="font-size:16px; font-weight: 800;">PROFIL DE L'ÉCOLE</h2>
-            <button onclick="toggleDrawer()" style="background:none; border:none; cursor:pointer; font-size:25px;">&times;</button>
-        </div>
+    <div id="casier-modal">
+        <div class="casier-content">
+            <button onclick="closeCasier()" style="position:absolute; right:20px; top:20px; background:none; border:none; font-size:30px; cursor:pointer;">&times;</button>
+            <h2 id="casier-title">Casier Numérique</h2>
+            <p id="casier-subtitle" style="color:var(--gold); font-weight:800; margin-bottom:20px;"></p>
 
-        <div class="drawer-section">
-            <h4>Identité</h4>
-            <input type="text" id="conf-nom" placeholder="Nom officiel de l'école">
-            <input type="text" id="conf-devise" placeholder="Devise / Slogan">
-            <select id="conf-type">
-                <option value="">Type d'établissement</option>
-                <option>Privé Agréé</option>
-                <option>Public</option>
-                <option>Conventionné</option>
-            </select>
-            <input type="text" id="conf-agrement" placeholder="N° d'Agrément">
-        </div>
+            <div class="tab-set">
+                <div class="tab-btn active" onclick="showTab('identite')">Identité</div>
+                <div class="tab-btn" onclick="showTab('famille')">Famille</div>
+                <div class="tab-btn" onclick="showTab('academique')">Académique</div>
+                <div class="tab-btn" onclick="showTab('finance')">Finances</div>
+                <div class="tab-btn" onclick="showTab('discipline')">Discipline</div>
+            </div>
 
-        <div class="drawer-section">
-            <h4>Contacts & Localisation</h4>
-            <input type="text" id="conf-adresse" placeholder="Adresse complète">
-            <input type="text" id="conf-ville" placeholder="Ville / Commune">
-            <input type="text" id="conf-tel" placeholder="Téléphone officiel">
-            <input type="email" id="conf-email" placeholder="Email officiel">
-        </div>
+            <div id="tab-identite" class="tab-content">
+                <div class="grid">
+                    <div><label>Matricule 🔑</label><input type="text" readonly id="casier-matricule"></div>
+                    <div><label>Lieu de naissance</label><input type="text" id="casier-lieu"></div>
+                    <div><label>Nationalité</label><input type="text" id="casier-nat"></div>
+                    <div style="grid-column: span 2;"><label>Adresse Complète</label><input type="text" id="casier-addr"></div>
+                </div>
+            </div>
 
-        <div class="drawer-section">
-            <h4>Direction</h4>
-            <input type="text" id="conf-promoteur" placeholder="Nom du Promoteur">
-            <input type="text" id="conf-prefet" placeholder="Nom du Préfet">
-        </div>
+            <div id="tab-famille" class="tab-content" style="display:none;">
+                <input type="text" id="casier-parent" placeholder="Nom des parents / tuteurs">
+                <input type="text" id="casier-tel" placeholder="Numéro de téléphone">
+                <input type="email" id="casier-email" placeholder="Email parents">
+                <textarea id="casier-urgence" placeholder="Personne à contacter en cas d'urgence"></textarea>
+            </div>
 
-        <div class="drawer-section">
-            <h4>Annonces</h4>
-            <textarea id="conf-annonces" placeholder="Note d'annonce officielle..."></textarea>
-        </div>
+            <div id="tab-finance" class="tab-content" style="display:none;">
+                <div class="card" style="background:var(--gray);">
+                    <h4>État de paiement (Comptabilité)</h4>
+                    <p style="font-size:20px; font-weight:800; color:green; margin:10px 0;">Solde : 0.00 $</p>
+                    <p style="font-size:11px;">Les données sont synchronisées avec le module comptable.</p>
+                </div>
+            </div>
 
-        <button class="btn-gold" onclick="saveSchoolProfile()">ENREGISTRER LES MODIFICATIONS</button>
+            <button class="btn-gold" style="margin-top:20px;" onclick="updateCasier()">METTRE À JOUR LE CASIER</button>
+        </div>
     </div>
 
     <script>
@@ -152,97 +161,143 @@
         const SB_KEY = "sb_publishable_lNctOhdEyESJGitYGXDsqA_rNLhHNBe"; 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        // UI NAVIGATION
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('main-content').classList.toggle('shifted');
-        }
+        let currentStudentId = null;
 
-        function toggleDrawer() {
-            document.getElementById('config-drawer').classList.toggle('open');
-        }
-
-        function showModule(id) {
+        // UI
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('main-content').classList.toggle('shifted'); }
+        function showModule(id) { 
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('view-'+id).classList.add('active');
-            if(id !== 'portal') {
-                document.getElementById('top-nav').style.display = 'flex';
-                if(!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
-            }
+            if(id === 'students-list') loadClassesForFilter();
         }
 
         async function showLogin(role) {
-            const n = prompt("Nom d'utilisateur Directeur :");
-            if(n) {
-                document.getElementById('user-tag').innerText = n;
-                document.getElementById('welcome-text').innerText = "Bienvenue, M. " + n;
-                showModule('director');
-                await loadSchoolProfile(); // On charge les infos dès la connexion
-            }
+            const n = prompt("Nom du Directeur:");
+            if(n) { document.getElementById('top-nav').style.display = 'flex'; showModule('director'); loadSchoolProfile(); }
         }
 
-        // CHARGEMENT DES INFOS
-        async function loadSchoolProfile() {
-            const { data, error } = await _supabase.from('school_profile').select('*').eq('id', 1).single();
-            if (data) {
-                document.getElementById('display-school-name').innerText = data.nom_officiel ? data.nom_officiel.toUpperCase() : "SCHOLARITE PLATINUM";
-                document.getElementById('conf-nom').value = data.nom_officiel || '';
-                document.getElementById('conf-devise').value = data.devise || '';
-                document.getElementById('conf-type').value = data.type_ecole || '';
-                document.getElementById('conf-agrement').value = data.agrement || '';
-                document.getElementById('conf-adresse').value = data.adresse || '';
-                document.getElementById('conf-ville').value = data.ville || '';
-                document.getElementById('conf-tel').value = data.telephone || '';
-                document.getElementById('conf-email').value = data.email || '';
-                document.getElementById('conf-promoteur').value = data.promoteur || '';
-                document.getElementById('conf-prefet').value = data.prefet || '';
-                document.getElementById('conf-annonces').value = data.annonces_officielles || '';
-            }
-        }
+        // GESTION DES CLASSES
+        const optionsList = ["EB (Cycle de Base)", "Scientifique", "Littéraire", "Électricité", "Mécanique", "Commerciale"];
+        document.getElementById('opt-grid').innerHTML = optionsList.map(o => `<label><input type="checkbox" value="${o}"> ${o}</label>`).join('');
 
-        // SAUVEGARDE PROFIL
-        async function saveSchoolProfile() {
-            const schoolData = {
-                id: 1, // Fixe pour ne gérer qu'une seule école
-                nom_officiel: document.getElementById('conf-nom').value,
-                devise: document.getElementById('conf-devise').value,
-                type_ecole: document.getElementById('conf-type').value,
-                agrement: document.getElementById('conf-agrement').value,
-                adresse: document.getElementById('conf-adresse').value,
-                ville: document.getElementById('conf-ville').value,
-                telephone: document.getElementById('conf-tel').value,
-                email: document.getElementById('conf-email').value,
-                promoteur: document.getElementById('conf-promoteur').value,
-                prefet: document.getElementById('conf-prefet').value,
-                annonces_officielles: document.getElementById('conf-annonces').value
-            };
-
-            const { error } = await _supabase.from('school_profile').upsert(schoolData);
-            
-            if(!error) {
-                document.getElementById('display-school-name').innerText = schoolData.nom_officiel.toUpperCase();
-                alert("Profil de l'école sauvegardé avec succès !");
-                toggleDrawer();
-            } else {
-                alert("Erreur : " + error.message);
-            }
-        }
-
-        // ARCHITECTURE
-        const opts = ["Scientifique", "Math-Physique", "Littéraire", "Aviation-Civile", "Construction", "Commerciale", "Électricité", "Électronique"];
-        document.getElementById('opt-grid').innerHTML = opts.map(o => `<label style="padding:15px; border:1px solid var(--border); border-radius:15px; cursor:pointer; font-weight: 700; font-size: 12px;"><input type="checkbox" value="${o}"> ${o}</label>`).join('');
-
-        function generateArchitecture() {
+        async function generateAndSaveClasses() {
             const selected = Array.from(document.querySelectorAll('#opt-grid input:checked')).map(i => i.value);
-            let html = `<h3>Classes de l'établissement</h3><div class="grid" style="margin-top:20px;">`;
-            ["7ème EB", "8ème EB"].forEach(c => html += `<div class="card" style="font-weight: 800;">${c}</div>`);
-            selected.forEach(o => {
-                ["1ère", "2ème", "3ème", "4ème"].forEach(n => html += `<div class="card" style="font-weight: 800;">${n} ${o}</div>`);
+            const count = document.getElementById('class-count').value;
+            const letters = ["A", "B", "C", "D", "E"];
+            const classesToSave = [];
+
+            selected.forEach(opt => {
+                const niveaux = opt.includes("EB") ? ["7ème", "8ème"] : ["1ère", "2ème", "3ème", "4ème"];
+                niveaux.forEach(niv => {
+                    for(let i=0; i<count; i++) {
+                        classesToSave.push({ nom: `${niv} ${letters[i]}`, option: opt });
+                    }
+                });
             });
-            document.getElementById('class-results').innerHTML = html + `</div>`;
-            document.getElementById('setup-section').style.display = 'none';
+
+            const { error } = await _supabase.from('classes').insert(classesToSave);
+            if(!error) { alert("Architecture enregistrée !"); displayClasses(); }
+        }
+
+        async function displayClasses() {
+            const { data } = await _supabase.from('classes').select('*');
+            document.getElementById('class-display').innerHTML = data.map(c => `<div class="card"><b>${c.nom}</b><br><small>${c.option}</small></div>`).join('');
+        }
+
+        // GESTION DES ELEVES
+        async function loadClassesForFilter() {
+            const { data } = await _supabase.from('classes').select('*');
+            const select = document.getElementById('filter-classe');
+            select.innerHTML = '<option value="">Choisir une classe</option>' + data.map(c => `<option value="${c.id}">${c.nom} - ${c.option}</option>`).join('');
+        }
+
+        function addStudentRow() {
+            const tbody = document.getElementById('student-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="in-nom"></td>
+                <td><input type="text" class="in-postnom"></td>
+                <td><input type="text" class="in-prenom"></td>
+                <td><select class="in-sexe"><option>M</option><option>F</option></select></td>
+                <td><input type="date" class="in-date" onchange="checkFull(this)"></td>
+                <td><button onclick="this.parentElement.parentElement.remove()" style="color:red; background:none; border:none;"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function checkFull(el) {
+            document.getElementById('btn-add-line').style.display = 'block';
+        }
+
+        async function saveAllStudents() {
+            const classe_id = document.getElementById('filter-classe').value;
+            if(!classe_id) return alert("Sélectionnez d'abord une classe !");
+
+            const rows = document.querySelectorAll('#student-body tr');
+            const students = Array.from(rows).map(row => ({
+                nom: row.querySelector('.in-nom').value,
+                postnom: row.querySelector('.in-postnom').value,
+                prenom: row.querySelector('.in-prenom').value,
+                sexe: row.querySelector('.in-sexe').value,
+                date_naissance: row.querySelector('.in-date').value,
+                classe_id: classe_id,
+                matricule: "MAT-" + Math.floor(Math.random()*10000)
+            }));
+
+            const { error } = await _supabase.from('students').insert(students);
+            if(!error) { alert("Élèves enregistrés !"); loadStudents(); }
+        }
+
+        async function loadStudents() {
+            const cid = document.getElementById('filter-classe').value;
+            if(!cid) return;
+            const { data } = await _supabase.from('students').select('*').eq('classe_id', cid);
+            const tbody = document.getElementById('student-body');
+            tbody.innerHTML = data.map(s => `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:10px;">${s.nom}</td>
+                    <td>${s.postnom}</td>
+                    <td>${s.prenom}</td>
+                    <td>${s.sexe}</td>
+                    <td>${s.date_naissance}</td>
+                    <td><button class="btn-gold" style="padding:5px 10px; font-size:10px;" onclick="openCasier('${s.id}')">CASIER</button></td>
+                </tr>
+            `).join('');
+            document.getElementById('btn-add-line').style.display = 'block';
+        }
+
+        // LOGIQUE CASIER
+        async function openCasier(id) {
+            currentStudentId = id;
+            const { data } = await _supabase.from('students').select('*').eq('id', id).single();
+            document.getElementById('casier-title').innerText = `${data.nom} ${data.prenom}`;
+            document.getElementById('casier-subtitle').innerText = `Matricule : ${data.matricule}`;
+            document.getElementById('casier-modal').style.display = 'block';
+            // Remplir les champs...
+            document.getElementById('casier-matricule').value = data.matricule;
+            document.getElementById('casier-lieu').value = data.lieu_naissance || '';
+        }
+
+        function closeCasier() { document.getElementById('casier-modal').style.display = 'none'; }
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-'+tab).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        async function updateCasier() {
+            const upData = {
+                lieu_naissance: document.getElementById('casier-lieu').value,
+                nationalite: document.getElementById('casier-nat').value,
+                adresse: document.getElementById('casier-addr').value,
+                parent_nom: document.getElementById('casier-parent').value
+            };
+            await _supabase.from('students').update(upData).eq('id', currentStudentId);
+            alert("Casier mis à jour !");
         }
     </script>
 </body>
     </html>
-
+                
