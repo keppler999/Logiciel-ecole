@@ -5,35 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scholarite - Créer un compte</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Sacramento&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="background-container">
-        <div class="glass-card">
+    <div class="glass-container">
+        <div class="form-card">
             <h1 id="form-title">Créer un compte</h1>
+            <p class="subtitle">Bienvenue sur Scholarite</p>
             
-            <form id="scholarite-form">
-                <div class="input-group" id="group-nom">
-                    <label for="nom">Nom complet</label>
-                    <input type="text" id="nom" placeholder="Votre nom...">
+            <form id="auth-form">
+                <div class="input-group" id="name-group">
+                    <label for="name">Nom complet</label>
+                    <input type="text" id="name" placeholder="Votre nom">
                 </div>
 
-                <div class="input-group" id="group-email">
-                    <label for="email">Adresse email</label>
-                    <input type="email" id="email" placeholder="votre@email.com">
+                <div class="input-group">
+                    <label for="email">Adresse Email</label>
+                    <input type="email" id="email" placeholder="exemple@mail.com" required>
                 </div>
 
                 <div class="input-group">
                     <label for="password">Mot de passe</label>
-                    <input type="password" id="password" placeholder="••••••••">
+                    <input type="password" id="password" placeholder="••••••••" required>
                 </div>
 
-                <div class="button-container">
-                    <button type="submit" id="btn-main" class="btn-3d primary">Créer</button>
-                    <button type="button" id="btn-switch" class="btn-3d secondary">Se connecter</button>
-                </div>
+                <button type="submit" id="main-btn" class="btn-3d">Créer mon compte</button>
             </form>
+
+            <div class="switch-mode">
+                <p id="switch-text">Déjà membre ?</p>
+                <button id="toggle-btn">Se connecter</button>
+            </div>
         </div>
     </div>
 
