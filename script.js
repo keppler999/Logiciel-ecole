@@ -1,33 +1,33 @@
-const formTitle = document.getElementById('form-title');
-const mainBtn = document.getElementById('main-btn');
-const toggleBtn = document.getElementById('toggle-btn');
-const toggleText = document.getElementById('toggle-text');
-const nameField = document.getElementById('name-field');
+const btnSwitch = document.getElementById('btn-switch');
+const btnMain = document.getElementById('btn-main');
+const title = document.getElementById('form-title');
+const groupNom = document.getElementById('group-nom');
+const groupEmail = document.getElementById('group-email');
 
-let isSignUp = true;
+let isLoginMode = false;
 
-toggleBtn.addEventListener('click', () => {
-    isSignUp = !isSignUp;
+btnSwitch.addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
 
-    if (isSignUp) {
-        formTitle.innerText = "Créer un compte";
-        mainBtn.innerText = "Créer";
-        toggleBtn.innerText = "Se connecter";
-        toggleText.innerText = "Déjà un compte ?";
-        nameField.style.display = "block";
+    if (isLoginMode) {
+        title.innerText = "Se connecter";
+        btnMain.innerText = "Se connecter";
+        btnSwitch.innerText = "Pas de compte ? Créer";
+        groupEmail.style.display = "none"; // On masque l'email pour la connexion selon tes consignes (Nom + Pass)
+        groupNom.querySelector('label').innerText = "Nom d'utilisateur";
     } else {
-        formTitle.innerText = "Connexion";
-        mainBtn.innerText = "Se connecter";
-        toggleBtn.innerText = "Créer un compte";
-        toggleText.innerText = "Pas encore de compte ?";
-        nameField.style.display = "none";
+        title.innerText = "Créer un compte";
+        btnMain.innerText = "Créer";
+        btnSwitch.innerText = "Se connecter";
+        groupEmail.style.display = "block";
+        groupNom.querySelector('label').innerText = "Nom complet";
     }
 });
 
-// Interception de la soumission pour ton futur Backend
-document.getElementById('auth-form').addEventListener('submit', (e) => {
+// Capture de la soumission du formulaire
+document.getElementById('scholarite-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const action = isSignUp ? "Création de compte" : "Connexion";
-    alert(action + " en cours pour Scholarite...");
+    const action = isLoginMode ? "Connexion en cours..." : "Création du compte en cours...";
+    alert(action);
+    // Ici, tu pourras attacher ta logique Supabase
 });
-
